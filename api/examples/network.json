@@ -1,0 +1,203 @@
+{
+    "thingId": "test",
+    "timestamp": 1,
+    "counter": 32,
+    "nInterface": "eth0",
+    "ipAddress": "192.168.7.43",
+    "macAddress": "00:50:b6:17:33:80",
+    "totalSendRate": 0,
+    "totalRecvRate": 0,
+    "totalSendRecvRate": 0,
+    "peakRate": [
+        0,
+        0,
+        0
+    ],
+    "cummulative": [
+        0,
+        0,
+        0
+    ],
+    "connectionList": [
+        {
+            "ip": "linaro-alip",
+            "nPort": "44953",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0,
+            "tier3": 0,
+            "cummulative": 0
+        },
+        {
+            "ip": "nuq04s18-in-f8.1e100.net",
+            "nPort": "443",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0,
+            "tier3": 0,
+            "cummulative": 0
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "36350",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.606,
+            "tier3": 0.606,
+            "cummulative": 0
+        },
+        {
+            "ip": "nuq04s19-in-f8.1e100.net",
+            "nPort": "443",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0,
+            "tier3": 0,
+            "cummulative": 0
+        },
+        {
+            "ip": "224.0.0.251",
+            "nPort": "5353",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0,
+            "tier3": 0,
+            "cummulative": 0
+        },
+        {
+            "ip": "iPhone5s",
+            "nPort": "5353",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.126,
+            "tier3": 0.126,
+            "cummulative": 0.502
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "31613",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.019,
+            "tier3": 0.019,
+            "cummulative": 0.075
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.074,
+            "tier3": 0.074,
+            "cummulative": 0.296
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "38574",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.019,
+            "tier3": 0.019,
+            "cummulative": 0.075
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.074,
+            "tier3": 0.074,
+            "cummulative": 0.296
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "37589",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.019,
+            "tier3": 0.019,
+            "cummulative": 0.075
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.072,
+            "tier3": 0.072,
+            "cummulative": 0.286
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "54210",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.019,
+            "tier3": 0.019,
+            "cummulative": 0.075
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.072,
+            "tier3": 0.072,
+            "cummulative": 0.286
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "23477",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.017,
+            "tier3": 0.017,
+            "cummulative": 0.069
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.066,
+            "tier3": 0.066,
+            "cummulative": 0.264
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "39634",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.019,
+            "tier3": 0.019,
+            "cummulative": 0.075
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.037,
+            "tier3": 0.037,
+            "cummulative": 0.148
+        },
+        {
+            "ip": "linaro-alip",
+            "nPort": "42248",
+            "direction": "out",
+            "tier1": 0,
+            "tier2": 0.019,
+            "tier3": 0.019,
+            "cummulative": 0.075
+        },
+        {
+            "ip": "router.asus.com",
+            "nPort": "53",
+            "direction": "in",
+            "tier1": 0,
+            "tier2": 0.037,
+            "tier3": 0.037,
+            "cummulative": 0.148
+        }
+    ]
+}

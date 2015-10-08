@@ -1,0 +1,87 @@
+{
+    "thingId": "test",
+    "timestamp": 1,
+    "counter": 11,
+    "directoryList": [
+        {
+            "filesystem": "udev",
+            "fSize": 0,
+            "used": 0,
+            "available": 0,
+            "usage": "0%",
+            "mounted": "/dev"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0,
+            "available": 0,
+            "usage": "10%",
+            "mounted": "/run"
+        },
+        {
+            "filesystem": "/dev/disk/by-partlabel/rootfs",
+            "fSize": 6500,
+            "used": 5800,
+            "available": 0,
+            "usage": "90%",
+            "mounted": "/"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0.072,
+            "available": 0,
+            "usage": "1%",
+            "mounted": "/dev/shm"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0.004,
+            "available": 0,
+            "usage": "1%",
+            "mounted": "/run/lock"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0,
+            "available": 0,
+            "usage": "0%",
+            "mounted": "/sys/fs/cgroup"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0.004,
+            "available": 0,
+            "usage": "1%",
+            "mounted": "/tmp"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0,
+            "available": 0,
+            "usage": "0%",
+            "mounted": "/run/user/0"
+        },
+        {
+            "filesystem": "tmpfs",
+            "fSize": 0,
+            "used": 0.008,
+            "available": 0,
+            "usage": "1%",
+            "mounted": "/run/user/1000"
+        },
+        {
+            "filesystem": "/dev/mmcblk0p1",
+            "fSize": 0,
+            "used": 0,
+            "available": 0,
+            "usage": "30%",
+            "mounted": "/media/linaro/00BC-614E"
+        }
+    ]
+}

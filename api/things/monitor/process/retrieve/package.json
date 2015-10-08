@@ -1,0 +1,9 @@
+{
+  "name": "dragonpulse-things-monitor-process-retrieve",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "dragonpulse-lib": "0.1.0",
+    "dragonpulse-things-monitor-process-lib": "0.1.0"
+  }
+}

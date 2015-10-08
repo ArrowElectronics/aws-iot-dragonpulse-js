@@ -1,0 +1,9 @@
+{
+  "name": "dragonpulse-things-monitor-general-create",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "dragonpulse-lib": "0.1.0",
+    "dragonpulse-things-monitor-general-lib": "0.1.0"
+  }
+}

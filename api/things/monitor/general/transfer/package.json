@@ -1,0 +1,8 @@
+{
+  "name": "dragonpulse-things-monitor-general-transfer",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "dragonpulse-lib": "0.1.0"
+  }
+}
