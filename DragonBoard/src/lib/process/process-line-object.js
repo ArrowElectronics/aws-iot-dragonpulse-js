@@ -17,8 +17,4 @@ function ProcessLineObject(direction){
 	this.memory='';
 	this.state='';
 	this.user='-';
-	//removed nice and priority for now (pretty useless)
-	//cannot be non-empty
-	//this.nice=-1;
-	//this.priority=-1;
 }

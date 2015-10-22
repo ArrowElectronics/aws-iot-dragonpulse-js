@@ -12,7 +12,6 @@ var schedule = require('node-schedule');
 /**
  * Main
  */
-
 //go run the general job, wait for it to finish, then run the rest of the jobs
 
 var gjInstance = new generalJob();
@@ -23,7 +22,9 @@ var djInstance = new diskJob(generalInfo);
 var njInstance = new networkJob(generalInfo);
 var pjInstance = new processJob(generalInfo);
 
-//enable settings
+/**
+ * Constants
+ */
 var ENABLE_DISK = true;
 var ENABLE_NETWORK = true;
 var ENABLE_PROCESS = true;

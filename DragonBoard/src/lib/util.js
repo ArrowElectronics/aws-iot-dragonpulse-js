@@ -8,17 +8,19 @@ module.exports = Util;
 /**
  * Module dependencies
  */
-var mqtt = require('mqtt');
-var fs = require('fs');
+var awsIot = require('aws-iot-device-sdk');
 
 /**
  * Constants
  */
+var DEBUG=true;
 
-var AWS_ENDPOINT='data.iot.us-east-1.amazonaws.com';
-var AWS_KEY='./certs/device_key.pem';
-var AWS_CERT='./certs/device_identity.pem';
-var AWS_G5_CERT='./certs/rootCA.pem';
+var KEY_PEM='private.pem.key';
+var CERT_PEM='certificate.pem.crt';
+var ROOT_CA='root-CA.crt';
+
+var LOCAL_CERT_PATH='./certs/';
+var INSTALLED_CERT_PATH='/home/linaro/certs/';
 
 /**
  * Constructor
@@ -154,52 +156,47 @@ Util.prototype.getValueFromKeyValueStr = function(input, delim){
 }
 
 /**
- * Helper Methods
+ * IMPLEMENT AWS IOT SDK
  */
 
+//we take in a topic and the result we want to send
+//contained in the result is the thingId that we want to use as a clientId
 Util.prototype.sendToAmazon = function(topic, results){
 	if(results){
 		var clientId = results.thingId;
 		var message = JSON.stringify(results);
 		
-		console.log(message);
-
-		var client = mqtt.connect(buildAWSClientParams(clientId));
+		//console.log(message);
 		
-		client.on('connect', function(){
-			
+		//device key = private.pem.key
+		//device identity = certificate.pem.crt
+		
+		var certPath='';
+		
+		//run locally?
+		if(DEBUG){
+			//console.log('searching locally for certs');
+			certPath=LOCAL_CERT_PATH;
+		}
+		else{
+			certPath=INSTALLED_CERT_PATH;
+		}
+		
+		var device = awsIot.device({
+			keyPath: certPath + KEY_PEM,
+			certPath: certPath + CERT_PEM,
+			caPath: certPath + ROOT_CA,
+			clientId: clientId,
+			region: 'us-east-1'
+		});
+		
+		device.on('connect', function(){
 			console.log('writing to ' + topic);
-			client.publish(topic, message, buildPublishOptions());
+			device.publish(topic, message);
 			console.log('published');
-			client.end();
 		});
 	}
 	else{
 		console.log('no results returned');
 	}
-}
-
-function buildAWSClientParams(thingId){
-	var clientParams = {};
-	clientParams.host=AWS_ENDPOINT;
-	clientParams.port=8883;
-	clientParams.clientId=thingId;
-	clientParams.key=fs.readFileSync(AWS_KEY);
-	clientParams.cert=fs.readFileSync(AWS_CERT);
-	clientParams.rejectUnauthorized=false;
-	clientParams.requestCert=true;
-	clientParams.ca=[fs.readFileSync(AWS_G5_CERT)];
-	clientParams.protocol='mqtts';
-  	clientParams.protocolId='MQIsdp';
-  	clientParams.protocolVersion=3;
-  	clientParams.secureProtocol='SSLv23_method';
-	
-	return clientParams;
-}
-
-function buildPublishOptions(){
-	var options={};
-	options.qos=0;
-	options.retain = false;
-	return options;
 }

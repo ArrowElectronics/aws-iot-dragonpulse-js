@@ -5,8 +5,8 @@ var dInterval;
 var pInterval;
 var gInterval;
 
-//Create some consts
-const DB_API = '';
+//moved to config.js
+//const DB_API = '';
 
 const PROCESS_ENDPOINT = '/monitor/process';
 const NETWORK_ENDPOINT = '/monitor/network';
@@ -18,12 +18,13 @@ const LOCAL_NETWORK_ENDPOINT = 'network.json';
 const LOCAL_DISK_ENDPOINT = 'disk.json';
 const LOCAL_GENERAL_ENDPOINT = 'general.json';
 
-const DEBUG=false;
-
 //---------------------------------------
 
-// replace string placeholders with values
-// 'this is a value of {1}'.apply(100) ===> 'this is a value of 100'
+/**
+ * add an apply to string
+ * replace string placeholders with values
+ * 'this is a value of {1}'.apply(100) ===> 'this is a value of 100'
+ */
 String.prototype.apply = function() {
     var a = arguments;
 
@@ -34,6 +35,11 @@ String.prototype.apply = function() {
 
 //---------------------------------------
 
+/**
+ * add a has to array
+ * returns true if array contains the string
+ * @param {string} v - value to search for
+ */
 Array.prototype.has = function(v) {
     return $.inArray(v, this) > -1;
 };
@@ -43,7 +49,12 @@ Array.prototype.has = function(v) {
 //---------------------------------------
 
 (function (uilib, $, undefined){
-
+    
+    /**
+     * generic function to make ajax calls
+     * @param {string} thingId - the thingId to get data about
+     * @param {string} dType - the type of data to query for
+     */
     uilib.refreshData = function(thingId, dType){
 
       var params={};
@@ -144,7 +155,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+    
+    /**
+     * read the successful data for process topic
+     * @param {object} data - topic should return a JSON object
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.readProcessData = function (data, txtStatus, jqXHR){
         //fill #process_summary-table-rows
         //fill #process-table-rows
@@ -219,9 +236,6 @@ Array.prototype.has = function(v) {
                         var pRow=[];
                         pRow.push(process.pid);
                         pRow.push(process.user);
-                        // removed
-                        //pRow.push(process.priority);
-                        //pRow.push(process.nice);
                         pRow.push(process.state);
                         pRow.push(process.cpu);
                         pRow.push(prettyPrintSizeMetric(process.memory,memoryUnits,''));
@@ -245,7 +259,12 @@ Array.prototype.has = function(v) {
 
     //---------------------------------------
 
-
+    /**
+     * on the return of the ajax call, a catch-all to display error message for the user
+     * @param {object} data - returned data from ajax call
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.alwaysProcess = function(data, txtStatus, jqXHR){
         var pUpdate=$('#process-update');
 
@@ -258,7 +277,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+    
+    /**
+     * read the successful data for network topic
+     * @param {object} data - topic should return a JSON object
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.readNetworkData = function (data, txtStatus, jqXHR){
         //fill #network-table-rows
         var networkElement = $('#network-table-rows');
@@ -320,7 +345,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+    
+    /**
+     * on the return of the ajax call, a catch-all to display error message for the user
+     * @param {object} data - returned data from ajax call
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.alwaysNetwork = function(data, txtStatus, jqXHR){
         var nUpdate=$('#network-update');
 
@@ -332,7 +363,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+    
+    /**
+     * read the successful data for disk topic
+     * @param {object} data - topic should return a JSON object
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.readDiskData = function (data, txtStatus, jqXHR){
         //fill #disk-list-items
         var diskElement = $('#disk-list-items');
@@ -369,7 +406,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+   
+    /**
+     * on the return of the ajax call, a catch-all to display error message for the user
+     * @param {object} data - returned data from ajax call
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.alwaysDisk = function(data, txtStatus, jqXHR){
         var dUpdate=$('#disk-update');
 
@@ -383,7 +426,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+    
+    /**
+     * read the successful data for general topic
+     * @param {object} data - topic should return a JSON object
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.readGeneralData = function (data, txtStatus, jqXHR){
         //fill #general-table-rows
         var generalElement = $('#general-table-rows');
@@ -442,7 +491,13 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
-
+    
+    /**
+     * on the return of the ajax call, a catch-all to display error message for the user
+     * @param {object} data - returned data from ajax call
+     * @param {string} txtStatus - standard return from jquery ajax
+     * @param {object} jqXHR - jquery handle
+     */
     uilib.alwaysGeneral = function(data, txtStatus, jqXHR){
         var gUpdate=$('#general-update');
 
@@ -455,7 +510,12 @@ Array.prototype.has = function(v) {
     };
     
     //---------------------------------------
-
+    
+    /**
+     * write the status into an element
+     * @param {object} element - jquery handle to the element
+     * @param {string} message - string to paint into html dom
+     */
     function manageCallbackResult(element, message){
       if(element){
         element.html(message);
@@ -467,10 +527,8 @@ Array.prototype.has = function(v) {
 //---------------------------------------
 
 $(document).ready(function() {
-
-//db2
- var thingId='a5be1bec055448b4979aefd3fc3833e2';
-
+   
+ //chart for network, using the c3 library
  chartNetwork = c3.generate({
     bindto: '#network-graph',
     size: {
@@ -530,120 +588,47 @@ $(document).ready(function() {
 
   //disk
   dInterval = setInterval(function(){
-    uilib.refreshData(thingId,'disk')
+    uilib.refreshData(THING_ID,'disk')
   }, 5000);
 
   //process
   pInterval = setInterval(function(){
-    uilib.refreshData(thingId,'process')
+    uilib.refreshData(THING_ID,'process')
   }, 1000);
 
   //network
   nInterval = setInterval(function(){
-    uilib.refreshData(thingId,'network')
+    uilib.refreshData(THING_ID,'network')
   }, 1000);
 
   //general
   gInterval = setInterval(function(){
-    uilib.refreshData(thingId,'general')
+    uilib.refreshData(THING_ID,'general')
   }, 30000);
   
 });
 
 //---------------------------------------
-
-/*
-$(function() {
-    var timeout;
-    $(window).on('resize', function () {
-        if (timeout) clearTimeout(timeout);
-        timeout = setTimeout(function () {
-            // Adjust spacings of 0 and 20 ticks
-            $($('#network-graph.c3 .c3-axis.c3-axis-y g.tick text')[0]).css('text-anchor', 'start');
-            $($('#network-graph.c3 .c3-axis.c3-axis-y g.tick text')[5]).css('text-anchor', 'end');
-
-            // Equal height on the first 3 panels
-            var heights = $(".panel-eq-height").map(function () {
-                        return $(this).height();
-                    }).get(),
-                maxHeight = Math.max.apply(null, heights);
-
-            $(".panel-eq-height").height( $(window).width() > 974 ? maxHeight : 'auto' );
-        }, 150);
-    });
-    setTimeout(function() {
-        $(window).trigger('resize');
-    }, 150);
-});
-*/
-
-//---------------------------------------
 // HELPER FUNCTIONS
 //---------------------------------------
 
+/**
+ * set the html of an element
+ * @param {object} elem - a jquery handle to the element
+ * @param {string} status - the html to paint
+ */
 function setElementStatus(elem, status){
     if(elem){
         elem.html(status);
     }
 }
 
-function enableButton(elem, enable){
-    if(elem){
-        if(enable){
-            if(elem.hasClass('disabled')){
-                elem.removeClass('disabled');
-            }
-        }
-        else{
-            if(elem.hasClass('disabled')){
+//---------------------------------------
 
-            }
-            else{
-                elem.addClass('disabled');
-            }
-        }
-    }
-}
-
-//enable the element to off/on, if writeOff is true, then add the off class
-function enableElement(elem, enable, writeOff){
-    
-    var OFF_STATUS='off';
-    var ON_STATUS='on';
-    
-    //default to be off
-    var desiredStatus=OFF_STATUS;
-    var currentStatus=ON_STATUS;
-    
-    if(enable){
-        desiredStatus=ON_STATUS;
-        currentStatus=OFF_STATUS;
-    }
-    else{
-        desiredStatus=OFF_STATUS;
-        currentStatus=ON_STATUS;
-    }
-    
-    if(elem){
-       //remove the current status
-       if(elem.hasClass(currentStatus)){
-           elem.removeClass(currentStatus);
-       } 
-       
-       //add the desired status
-       if(!elem.hasClass(desiredStatus)){
-           var writeState=true;
-           
-           if(desiredStatus===OFF_STATUS && !writeOff){
-               writeState=false;
-           }
-           if(writeState){
-               elem.addClass(desiredStatus);
-           } 
-       }
-    }
-}
-
+/**
+ * check to see if it's null or empty, if it is print nothing
+ * @param {object} input - could be string or object
+ */
 function prettyPrintEmpty(input){
   if(input){
     return input;
@@ -652,7 +637,13 @@ function prettyPrintEmpty(input){
   return '';
 }
 
+//---------------------------------------
 
+/**
+ * build general information, we make a specific case for dragonboard so we can display the logo
+ * @param {string} device - the device type
+ * @param {array} matrix - 2d array that represents a table
+ */
 function buildGeneralInformationTable(device, matrix){
     var content='';
     if(device){
@@ -669,7 +660,13 @@ function buildGeneralInformationTable(device, matrix){
     return content;
 }
 
-//build individual disk items
+//---------------------------------------
+
+/**
+ * build individual disk items
+ * @param {object} diskObject - a custom object representing disk
+ * @param {array} filterFileSystem - filter some of the disk data based on the filesystem
+ */
 function buildDiskListItem(diskObject, filterFileSystem){
     var content='';
     if(diskObject){
@@ -691,8 +688,15 @@ function buildDiskListItem(diskObject, filterFileSystem){
     return content;
 }
 
-//pretty print the size with a default base of Megabytes
-//units is in the form [base, up, down], ie [M, G, K]
+//---------------------------------------
+
+/**
+ * pretty print the size with a default base of Megabytes
+ * units is in the form [base, up, down], ie [M, G, K]
+ * @param {number} numSize - the original number
+ * @param {char} customUnits - the unit to convert to
+ * @param {string} label - the label to be appended to the display string
+ */
 function prettyPrintSizeMetric(numSize, customUnits, label){
   var defaultUnits = ['M','G','K'];
   var units = defaultUnits;
@@ -722,7 +726,12 @@ function prettyPrintSizeMetric(numSize, customUnits, label){
   return result;
 }
 
-//build the progress bar - taking in a percent
+//---------------------------------------
+
+/**
+ * build a bootstrap progress bar - taking in a percent
+ * @param {number} percent - the percent bar complete
+ */
 function buildProgressBar(percent){
     var content='';
     if(percent){
@@ -731,7 +740,13 @@ function buildProgressBar(percent){
     return content;
 }
 
-//given a matrix, which represents the table, print out all the rows
+//---------------------------------------
+
+/**
+ * given a matrix, which represents the table, print out all the rows
+ * @param {array} matrix - 2 dimensional array, representing a table
+ * @param {boolean} emphasisColumn - flag to control adding emphasis class
+ */ 
 function buildTableRow(matrix, emphasisColumn){
     var hasEmphasis = false;
 
@@ -788,7 +803,12 @@ function buildTableRow(matrix, emphasisColumn){
     return content;
 }
 
-//round to 2 sig digits
+//---------------------------------------
+
+/**
+ * round to 2 sig digits
+ * @param {number} num - float to be rounded
+ */
 function roundToTwo(num) {
     return +(Math.round(num + "e+2")  + "e-2");
 }
