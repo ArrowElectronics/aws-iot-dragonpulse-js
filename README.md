@@ -1,4 +1,4 @@
-# Welcome to aws-iot-thing-sdk-dragonpulse-js
+# Welcome to aws-iot-dragonpulse-js
 
 DragonPulse demonstrates collecting system data from a DragonBoard&trade; and publishing this data to an MQTT topic.  The data is stored in a DynamoDB table and retrieved by a web browser through the API Gateway.
 
