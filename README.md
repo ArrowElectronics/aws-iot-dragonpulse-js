@@ -16,7 +16,10 @@ Upload the contents of the ui directory to s3 and configure the bucket to act as
 
 ## DragonPulse on the DragonBoard&trade;
 Make sure to complete the tasks in [aws-iot-device-sdk](https://github.com/ArrowElectronics/aws-iot-device-sdk)
+
+
 1. DragonPulse step
+
 2. Install the Private key and Certificate
 
 * Run DragonPulse as root, in order to access iftop

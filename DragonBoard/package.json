@@ -8,7 +8,7 @@
     "email": "",
     "url": "http://www.arrow.com"
   },
-  "homepage": "https://github.com/arrowelectronics/aws-iot-thing-sdk-dragonpulse-js",
+  "homepage": "https://github.com/arrowelectronics/aws-iot-dragonpulse-js",
     "contributors": [
       "Greg Tam <gtam@arrow.com>",
       "Brian Keyser <bkeyser@arrow.com>",
@@ -20,7 +20,7 @@
   "main": "src/app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arrowelectronics/aws-iot-thing-sdk-dragonpulse-js"
+    "url": "https://github.com/arrowelectronics/aws-iot-dragonpulse-js"
   },
   "dependencies": {
     "node-schedule" : "0.2.x",
