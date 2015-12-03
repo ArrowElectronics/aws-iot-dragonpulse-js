@@ -190,9 +190,10 @@ Util.prototype.sendToAmazon = function(topic, results){
 			region: 'us-east-1'
 		});
 		
+		var pub_topic = 'things/' + clientId + '/' + topic;
 		device.on('connect', function(){
-			console.log('writing to ' + topic);
-			device.publish(topic, message);
+			console.log('writing to ' + pub_topic);
+			device.publish(pub_topic, message);
 			console.log('published');
 		});
 	}
