@@ -1,2 +1,0 @@
-AWS IoT Thing SDK DragonPulse JavaScript
-Copyright 2015 Arrow Electronics, Inc. All Rights Reserved.
