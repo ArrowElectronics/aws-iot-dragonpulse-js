@@ -3,11 +3,11 @@ var chartNetwork;
 var nInterval;
 var dInterval;
 var pInterval;
-var gInterval;
 
 //moved to config.js
 //const DB_API = '';
 
+const THINGS_ENDPOINT='/things';
 const PROCESS_ENDPOINT = '/monitor/process';
 const NETWORK_ENDPOINT = '/monitor/network';
 const DISK_ENDPOINT = '/monitor/disk';
@@ -17,6 +17,7 @@ const LOCAL_PROCESS_ENDPOINT = 'process.json';
 const LOCAL_NETWORK_ENDPOINT = 'network.json';
 const LOCAL_DISK_ENDPOINT = 'disk.json';
 const LOCAL_GENERAL_ENDPOINT = 'general.json';
+const LOCAL_THINGS_ENDPOINT= 'things.json';
 
 //---------------------------------------
 
@@ -45,6 +46,29 @@ Array.prototype.has = function(v) {
 };
 
 //---------------------------------------
+
+/**
+ * extract the key, we assume the key to be constructed using -
+ * @param {string} input - original string
+ * @param {number} idx - index to return, starts at 0
+ */
+function extractKey(input, idx){
+  // console.log('extracting: ' + input);
+  if(input){
+    var sp= input.split('-');
+    if(idx){
+      // console.log('extracted: ' + sp[idx]);
+      return sp[idx];
+    }
+    else{
+      // console.log('extracted: ' + sp[1]);
+      return sp[1];
+    }
+  }
+  return '';
+}
+
+//---------------------------------------
 // UI LIB
 //---------------------------------------
 
@@ -60,12 +84,13 @@ Array.prototype.has = function(v) {
       var params={};
   	 	//params.limit=10;
 
-      var baseUrl='';
+      var baseUrl=''+DB_API;
+
       if(DEBUG){
-        baseUrl='{1}/{2}';
+        baseUrl='{1}{2}/{3}';
       }
       else{
-        baseUrl='{1}/things/{2}{3}';
+        baseUrl+='{1}/{2}{3}';
       }
 
       var actionUrl='';
@@ -77,10 +102,10 @@ Array.prototype.has = function(v) {
         if(dType){
           if(dType==='process'){
             if(DEBUG){
-                 actionUrl = baseUrl.apply(thingId, LOCAL_PROCESS_ENDPOINT);
+                 actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, LOCAL_PROCESS_ENDPOINT);
             }
             else{
-                 actionUrl = baseUrl.apply(DB_API, thingId, PROCESS_ENDPOINT);
+                 actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, PROCESS_ENDPOINT);
             }
             readFn = uilib.readProcessData;
             alwaysFn = uilib.alwaysProcess;
@@ -88,10 +113,10 @@ Array.prototype.has = function(v) {
           }
           else if(dType==='network'){
             if(DEBUG){
-                 actionUrl = baseUrl.apply(thingId, LOCAL_NETWORK_ENDPOINT);
+                 actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, LOCAL_NETWORK_ENDPOINT);
             }
             else{
-                actionUrl = baseUrl.apply(DB_API, thingId, NETWORK_ENDPOINT);
+                actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, NETWORK_ENDPOINT);
             }
             readFn = uilib.readNetworkData;
             alwaysFn = uilib.alwaysNetwork;
@@ -99,10 +124,10 @@ Array.prototype.has = function(v) {
           }
           else if(dType==='disk'){
             if(DEBUG){
-                 actionUrl = baseUrl.apply(thingId, LOCAL_DISK_ENDPOINT);
+                 actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, LOCAL_DISK_ENDPOINT);
             }
             else{
-                  actionUrl = baseUrl.apply(DB_API, thingId, DISK_ENDPOINT);
+                  actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, DISK_ENDPOINT);
             }
             readFn = uilib.readDiskData;
             alwaysFn = uilib.alwaysDisk;
@@ -110,10 +135,10 @@ Array.prototype.has = function(v) {
           }
           else if(dType==='general'){
             if(DEBUG){
-                 actionUrl = baseUrl.apply(thingId, LOCAL_GENERAL_ENDPOINT);
+                 actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, LOCAL_GENERAL_ENDPOINT);
             }
             else{
-                actionUrl = baseUrl.apply(DB_API, thingId, GENERAL_ENDPOINT);
+                actionUrl = baseUrl.apply(THINGS_ENDPOINT, thingId, GENERAL_ENDPOINT);
             }
             readFn = uilib.readGeneralData;
             alwaysFn = uilib.alwaysGeneral;
@@ -141,6 +166,7 @@ Array.prototype.has = function(v) {
           crossDomain: true,
           jsonp: false,
           cache: false,
+          contentType: 'application/json',
           data: params
         })
         .done(readFn)
@@ -154,6 +180,8 @@ Array.prototype.has = function(v) {
 
     };
 
+    //---------------------------------------
+    // PROCESS
     //---------------------------------------
     
     /**
@@ -277,6 +305,8 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
+    // NETWORK
+    //---------------------------------------
     
     /**
      * read the successful data for network topic
@@ -363,6 +393,8 @@ Array.prototype.has = function(v) {
     };
 
     //---------------------------------------
+    // DISK
+    //---------------------------------------
     
     /**
      * read the successful data for disk topic
@@ -425,6 +457,8 @@ Array.prototype.has = function(v) {
 
     };
 
+    //---------------------------------------
+    // GENERAL
     //---------------------------------------
     
     /**
@@ -510,7 +544,91 @@ Array.prototype.has = function(v) {
     };
     
     //---------------------------------------
+    // THINGS
+    //---------------------------------------
     
+    uilib.getThings = function(){
+        
+        var baseUrl='';
+        var actionUrl='';
+        
+        if(DEBUG){
+            baseUrl='{1}/{2}';
+            actionUrl = baseUrl.apply(THINGS_ENDPOINT, LOCAL_THINGS_ENDPOINT);
+        }
+        else{
+            baseUrl='{1}/{2}';
+            actionUrl = baseUrl.apply(DB_API, THINGS_ENDPOINT);
+        }
+
+        $('#menu-select-device').html('<li><a href=\"#\"><img src=\"gfxs/ajax-loader.gif\"/> getting things...</a></li>');
+
+        var jqxhr = $.ajax({
+          url: actionUrl,
+          crossDomain: true,
+          jsonp: false,
+          cache: false,
+          contentType: 'application/json'
+        })
+        .done(uilib.readThingsData)
+        .fail(uilib.alwaysThings);
+    }
+
+    //---------------------------------------
+    
+    uilib.readThingsData = function (data, txtStatus, jqXHR){
+        //fill #menu-select-device
+        var sAlert=$('#status-alert');
+
+        var thingsObj;
+        if (DEBUG) {
+            thingsObj = JSON.parse(data);
+        } else {
+            thingsObj = data;
+        }
+        if(thingsObj){
+          var menuDevices = $('#menu-select-device');
+          var menuContent='';
+          var menuListTemplate='<li><a href=\"#\" id=\"device-{1}\" class=\"btn-device\">{2}</a></li>';
+
+          if(thingsObj.length > 0){
+            for(var i in thingsObj){
+              var aThing = thingsObj[i];
+              var dId = aThing.thingId;
+              if(dId){
+                var aStr = menuListTemplate.apply(dId, dId);
+                menuContent+=aStr;
+              }
+            }
+          }
+
+          menuDevices.html(menuContent);
+
+          manageStatusAlert(sAlert, false, '');
+        }
+        else{
+          manageStatusAlert(sAlert, true, '<span class=\"text-warning\">invalid json</span>');
+        }
+    };
+
+    //---------------------------------------
+
+    uilib.alwaysThings = function(data, txtStatus, jqXHR){
+
+        var sAlert=$('#status-alert');
+
+        if(jqXHR.status === 200){
+          //manageCallbackResult(gUpdate, moment().format('YYYY-MM-DD hh:mm:ss'));
+        }
+        else{
+          manageStatusAlert(sAlert, true, '<span class=\"text-danger\">ajax error : could not get list of devices</span>');
+        }
+    };
+
+    //---------------------------------------
+    // STATUS / CALLBACKS
+    //---------------------------------------
+
     /**
      * write the status into an element
      * @param {object} element - jquery handle to the element
@@ -522,8 +640,27 @@ Array.prototype.has = function(v) {
       }
     }
 
+    //---------------------------------------
+
+    function manageStatusAlert(element, enable, message){
+      if(element){
+        if(enable){
+          element.show();
+        }
+        else{
+          element.hide();
+        }
+
+        if(message){
+          element.html(message);
+        }
+      }
+    }
+
 }(window.uilib = window.uilib || {}, $));
 
+//---------------------------------------
+// DOCUMENT READY
 //---------------------------------------
 
 $(document).ready(function() {
@@ -582,31 +719,53 @@ $(document).ready(function() {
     }
   });
 
- //---------------------------------------
- // Set refresh intervals
- //---------------------------------------
+  //---------------------------------------
 
-  //disk
-  dInterval = setInterval(function(){
-    uilib.refreshData(THING_ID,'disk')
-  }, 5000);
+  $(document).on('click', '#btn-select-device', function(e){
+    //execute ajax to pull in device data
+    uilib.getThings();
+    return false;
+  });
 
-  //process
-  pInterval = setInterval(function(){
-    uilib.refreshData(THING_ID,'process')
-  }, 1000);
+  //---------------------------------------
 
-  //network
-  nInterval = setInterval(function(){
-    uilib.refreshData(THING_ID,'network')
-  }, 1000);
+  $(document).on('click', '.btn-device', function(e){
+     // console.log('btn-device entered');
+     var deviceAgg = $(this).attr('id');
+     //extract the device id and put it into THING_ID
+     var deviceId = extractKey(deviceAgg, 1);
+     if(deviceId){
+        THING_ID = deviceId;
+        //all the other events have to cascade off this choice
+       
+        //reset the intervals
+        clearInterval(dInterval);
+        clearInterval(pInterval);
+        clearInterval(nInterval);
 
-  //general
-  gInterval = setInterval(function(){
-    uilib.refreshData(THING_ID,'general')
-  }, 30000);
+        dInterval = setInterval(function(){
+          uilib.refreshData(THING_ID,'disk')
+        }, 5000);
+
+        //process
+        pInterval = setInterval(function(){
+          uilib.refreshData(THING_ID,'process')
+        }, 1000);
+
+        //network
+        nInterval = setInterval(function(){
+          uilib.refreshData(THING_ID,'network')
+        }, 1000);
+
+        //we only need to call general once
+        uilib.refreshData(THING_ID,'general');
+
+        $('#current-thing').html(THING_ID);
+     }
+     return false;
+  });
   
-});
+}); //end document ready
 
 //---------------------------------------
 // HELPER FUNCTIONS
@@ -806,7 +965,7 @@ function buildTableRow(matrix, emphasisColumn){
 //---------------------------------------
 
 /**
- * round to 2 sig digits
+ * round to 2 significant digits
  * @param {number} num - float to be rounded
  */
 function roundToTwo(num) {
