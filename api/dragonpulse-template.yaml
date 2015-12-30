@@ -2,13 +2,11 @@ swagger: '2.0'
 info:
   title: Arrow DragonPulse
   description: >
-    The DragonPulse example collects general, disk, network, and process 
-    information from the Linux-based operating system running on
-    the DragonBoard 410c.  The information is sent through
-    _Amazon IoT_ MQTT topics and stored in _Amazon DynamoDB_ tables.
-    
-    The DragonPulse API is managed by the _Amazon API Gateway_.
-    
+    The DragonPulse example collects general, disk, network, and
+    process  information from the Linux-based operating system running on the
+    DragonBoard 410c.  The information is sent through _Amazon IoT_ MQTT topics
+    and stored in _Amazon DynamoDB_ tables.
+
     The _basePath_ is not defined as the API Gateway will add it as an
     additional path element.
   version: 0.1.0
@@ -1171,7 +1169,7 @@ definitions:
           10 seconds.
       ipAddress:
         type: string
-        pattern: '^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+        pattern: "^([0-9]{1,3}\\.){3}[0-9]{1,3}$"
         description: |
           The IP address of the network interface.
     required:
@@ -1209,7 +1207,7 @@ definitions:
         type: array
         items:
           type: string
-          pattern: '^[0-9\.]+$'
+          pattern: "^[0-9\\.]+$"
           minItems: 3
           maxItems: 3
           description: |
@@ -1219,7 +1217,7 @@ definitions:
         type: array
         items:
           type: string
-          pattern: '^[0-9\.]+$'
+          pattern: "^[0-9\\.]+$"
           minItems: 3
           maxItems: 3
           description: |
@@ -1271,7 +1269,7 @@ definitions:
           The command of the process.
       cpu:
         type: string
-        pattern: '^[0-9\.]+$'
+        pattern: "^[0-9\\.]+$"
         description: |
           The CPU utilization of the process.
       ttime:
