@@ -745,17 +745,17 @@ $(document).ready(function() {
 
         dInterval = setInterval(function(){
           uilib.refreshData(THING_ID,'disk')
-        }, 5000);
+        }, DISK_REFRESH_INTERVAL);
 
         //process
         pInterval = setInterval(function(){
           uilib.refreshData(THING_ID,'process')
-        }, 1000);
+        }, PROCESS_REFRESH_INTERVAL);
 
         //network
         nInterval = setInterval(function(){
           uilib.refreshData(THING_ID,'network')
-        }, 1000);
+        }, NETWORK_REFRESH_INTERVAL);
 
         //we only need to call general once
         uilib.refreshData(THING_ID,'general');
