@@ -1,9 +1,0 @@
-{
-  "name": "dragonpulse-things-monitor-disk-retrieve",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "dragonpulse-lib": "0.1.0",
-    "dragonpulse-things-monitor-disk-lib": "0.1.0"
-  }
-}

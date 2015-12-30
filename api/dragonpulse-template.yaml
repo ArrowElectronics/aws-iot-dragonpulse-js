@@ -1,0 +1,1335 @@
+swagger: '2.0'
+info:
+  title: Arrow DragonPulse
+  description: >
+    The DragonPulse example collects general, disk, network, and process 
+    information from the Linux-based operating system running on
+    the DragonBoard 410c.  The information is sent through
+    _Amazon IoT_ MQTT topics and stored in _Amazon DynamoDB_ tables.
+    
+    The DragonPulse API is managed by the _Amazon API Gateway_.
+    
+    The _basePath_ is not defined as the API Gateway will add it as an
+    additional path element.
+  version: 0.1.0
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  ContentTypeHeader:
+    name: Content-Type
+    description: |
+      The content type of the request
+    in: header
+    type: string
+  AcceptHeader:
+    name: Accept
+    description: |
+      The accept type for the response
+    in: header
+    type: string
+responses:
+  InvalidEntityError:
+    description: |
+      The request was invalid.  Please check the developer documentation
+      and validate the content of the request.
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        message: 'InvalidEntityError: The entity is invalid.'
+  ResourceNotFoundError:
+    description: |
+      The resource was not found in the environment.  For example,
+      this error might be raised when a resource associated with
+      a non-existent thing is attempted to be created.
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        message: 'ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information.'
+  UnknownError:
+    description: |
+      An internal service error has occurred.  This may be the result
+      of an improper configuration such as invalid permissions.  For
+      some specific errors, such as invalid permissions, a specific
+      error will be returned (AccessDeniedError).
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        message: 'AccessDeniedError:  Please check the permissions needed to perform this function.'
+paths:
+  /things:
+    get:
+      summary: Get the collection of things
+      description: |
+        Provides the collection of things that have an associated
+        principal.
+      parameters:
+        - $ref: '#/parameters/ContentTypeHeader'
+        - $ref: '#/parameters/AcceptHeader'
+      tags:
+        - Things
+      responses:
+        '200':
+          description: |
+            An array of things
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/ThingList'
+          examples:
+            application/json:
+              - thingId: MyThing
+                attributes:
+                  createdDate: 13423423
+              - thingId: MyOtherThing
+        '500':
+          $ref: '#/responses/UnknownError'
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-things/invocations'
+        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        requestTemplates:
+          application/json: |
+            {
+              "action": "retrieve",
+              "message": {}
+            }
+        responses:
+          'AccessDeniedError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'UnknownError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: null
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - CORS
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        httpMethod: GET
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode" : 200
+            }
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+  '/things/{thingId}':
+    parameters:
+      - name: thingId
+        description: The identifier of the thing.
+        in: path
+        required: true
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9_-]$'
+    get:
+      summary: Thing
+      description: |
+        Retrieves a thing with an identifier of _thingId_
+      parameters:
+        - $ref: '#/parameters/ContentTypeHeader'
+        - $ref: '#/parameters/AcceptHeader'
+      tags:
+        - Things
+      responses:
+        '200':
+          description: |
+            The thing associated with _thingId_
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Thing'
+        '400':
+          $ref: '#/responses/InvalidEntityError'
+        '404':
+          $ref: '#/responses/ResourceNotFoundError'
+        '500':
+          $ref: '#/responses/UnknownError'
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-things/invocations'
+        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        requestTemplates:
+          application/json: |
+            {
+              "action": "retrieve",
+              "message": {
+                "thingId": "$input.params('thingId')"
+              }
+            }
+        responses:
+          'InvalidEntityError:.*':
+            statusCode: '400'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'ResourceNotFoundError:.*':
+            statusCode: '404'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'AccessDeniedError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'UnknownError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: null
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - CORS
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        httpMethod: GET
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode" : 200
+            }
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+  '/things/{thingId}/monitor/disk':
+    parameters:
+      - name: thingId
+        description: The identifier of the thing.
+        in: path
+        required: true
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9_-]$'
+    get:
+      summary: Retrieve the disk observation for a thing.
+      description: |
+        Retrieves a disk observation for a thing with
+        identifier of _thingId_
+      tags:
+        - Monitor
+      parameters:
+        - $ref: '#/parameters/ContentTypeHeader'
+        - $ref: '#/parameters/AcceptHeader'
+      responses:
+        '200':
+          description: |
+            The disk observation.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/MonitorDisk'
+          examples:
+            application/json: |
+              {
+                "thingId": "test",
+                "timestamp": 1451495929,
+                "counter": 11,
+                "directoryList": [
+                  {
+                      "filesystem": "udev",
+                      "fSize": 0,
+                      "used": 0,
+                      "available": 0,
+                      "usage": "0%",
+                      "mounted": "/dev"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0,
+                      "available": 0,
+                      "usage": "10%",
+                      "mounted": "/run"
+                  },
+                  {
+                      "filesystem": "/dev/disk/by-partlabel/rootfs",
+                      "fSize": 6500,
+                      "used": 5800,
+                      "available": 0,
+                      "usage": "90%",
+                      "mounted": "/"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0.072,
+                      "available": 0,
+                      "usage": "1%",
+                      "mounted": "/dev/shm"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0.004,
+                      "available": 0,
+                      "usage": "1%",
+                      "mounted": "/run/lock"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0,
+                      "available": 0,
+                      "usage": "0%",
+                      "mounted": "/sys/fs/cgroup"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0.004,
+                      "available": 0,
+                      "usage": "1%",
+                      "mounted": "/tmp"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0,
+                      "available": 0,
+                      "usage": "0%",
+                      "mounted": "/run/user/0"
+                  },
+                  {
+                      "filesystem": "tmpfs",
+                      "fSize": 0,
+                      "used": 0.008,
+                      "available": 0,
+                      "usage": "1%",
+                      "mounted": "/run/user/1000"
+                  },
+                  {
+                      "filesystem": "/dev/mmcblk0p1",
+                      "fSize": 0,
+                      "used": 0,
+                      "available": 0,
+                      "usage": "30%",
+                      "mounted": "/media/linaro/00BC-614E"
+                  }
+                ]
+              }
+        '404':
+          $ref: '#/responses/ResourceNotFoundError'
+        '500':
+          $ref: '#/responses/UnknownError'
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        requestTemplates:
+          application/json: |
+            #set($limit = $input.params('limit'))
+            {
+              "action": "retrieve",
+              "type": "disk",
+              "message": {
+                "thingId": "$input.params('thingId')"
+              }
+            }
+        responses:
+          'InvalidEntityError:.*':
+            statusCode: '400'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'ResourceNotFoundError:.*':
+            statusCode: '404'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'AccessDeniedError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'UnknownError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: null
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - CORS
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        httpMethod: GET
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode" : 200
+            }
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+  '/things/{thingId}/monitor/general':
+    parameters:
+      - name: thingId
+        description: The identifier of the thing.
+        in: path
+        required: true
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9_-]$'
+    get:
+      summary: Retrieve the general observation for a thing.
+      description: |
+        Retrieves a general observation for a thing with
+        identifier of _thingId_
+      tags:
+        - Monitor
+      parameters:
+        - $ref: '#/parameters/ContentTypeHeader'
+        - $ref: '#/parameters/AcceptHeader'
+      responses:
+        '200':
+          description: |
+            The general observation.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/MonitorGeneral'
+          examples:
+            application/json: |
+              {
+                "thingId": "test",
+                "timestamp": 1451495929,
+                "deviceType": "MacBookPro11,3",
+                "os": "darwin",
+                "osVariant": "Mac OS X",
+                "osVersion": "10.10.5",
+                "osCodename": "yosemite",
+                "build": "14.5.0",
+                "architecture": "x86_64"
+              }
+        '404':
+          $ref: '#/responses/ResourceNotFoundError'
+        '500':
+          $ref: '#/responses/UnknownError'
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        requestTemplates:
+          application/json: |
+            #set($limit = $input.params('limit'))
+            {
+              "action": "retrieve",
+              "type": "general",
+              "message": {
+                "thingId": "$input.params('thingId')"
+              }
+            }
+        responses:
+          'InvalidEntityError:.*':
+            statusCode: '400'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'ResourceNotFoundError:.*':
+            statusCode: '404'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'AccessDeniedError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'UnknownError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: null
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - CORS
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        httpMethod: GET
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode" : 200
+            }
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+  '/things/{thingId}/monitor/network':
+    parameters:
+      - name: thingId
+        description: The identifier of the thing.
+        in: path
+        required: true
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9_-]$'
+    get:
+      summary: Retrieve the network observation for a thing.
+      description: |
+        Retrieves a network observation for a thing with
+        identifier of _thingId_
+      tags:
+        - Monitor
+      parameters:
+        - $ref: '#/parameters/ContentTypeHeader'
+        - $ref: '#/parameters/AcceptHeader'
+      responses:
+        '200':
+          description: |
+            The network observation.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/MonitorNetwork'
+          examples:
+            application/json: |
+              {
+                "thingId": "test",
+                "timestamp": 1451499129,
+                "counter": 1,
+                "totalSendRate": 10,
+                "nInterface": "eth0'"
+                "cummulative": [ 1, 2, 3 ],
+                "totalSendRecvRate": 20,
+                "macAddress": "06:5e:60:d7:f8:97",
+                "peakRate": [ 1, 2, 3 ],
+                "totalRecvRate": 30,
+                "ipAddress": "192.168.1.139"
+              }
+        '404':
+          $ref: '#/responses/ResourceNotFoundError'
+        '500':
+          $ref: '#/responses/UnknownError'
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        requestTemplates:
+          application/json: |
+            #set($limit = $input.params('limit'))
+            {
+              "action": "retrieve",
+              "type": "network",
+              "message": {
+                "thingId": "$input.params('thingId')"
+              }
+            }
+        responses:
+          'InvalidEntityError:.*':
+            statusCode: '400'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'ResourceNotFoundError:.*':
+            statusCode: '404'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'AccessDeniedError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'UnknownError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: null
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - CORS
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        httpMethod: GET
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode" : 200
+            }
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+  '/things/{thingId}/monitor/process':
+    parameters:
+      - name: thingId
+        description: The identifier of the thing.
+        in: path
+        required: true
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9_-]$'
+    get:
+      summary: Retrieve the process observation for a thing.
+      description: |
+        Retrieves a process observation for a thing with
+        identifier of _thingId_
+      tags:
+        - Monitor
+      parameters:
+        - $ref: '#/parameters/ContentTypeHeader'
+        - $ref: '#/parameters/AcceptHeader'
+      responses:
+        '200':
+          description: |
+            The process observation.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/MonitorProcess'
+          examples:
+            application/json: |
+              {
+                "thingId": "test",
+                "timestamp": 1451501291,
+                "counter": 190,
+                "loadAvg": [
+                    "1.14",
+                    "1.12",
+                    "1.14"
+                ],
+                "cpuUsage": [
+                    "2.4",
+                    "1.1",
+                    "96.4"
+                ],
+                "tasks": [
+                    "183",
+                    "2",
+                    "181",
+                    "0"
+                ],
+                "memory": [
+                    "922892",
+                    "800944",
+                    "121948",
+                    "38584"
+                ],
+                "processList": [
+                    {
+                        "pid": "605",
+                        "command": "Xorg",
+                        "cpu": "86.9",
+                        "ttime": "3:15.27",
+                        "memory": "170400",
+                        "state": "running",
+                        "user": "root",
+                        "nice": "0",
+                        "priority": "20"
+                    },
+                    {
+                        "pid": "3795",
+                        "command": "iftop",
+                        "cpu": "30.7",
+                        "ttime": "0:00.07",
+                        "memory": "163228",
+                        "state": "sleeping",
+                        "user": "root",
+                        "nice": "0",
+                        "priority": "20"
+                    },
+                    {
+                        "pid": "3798",
+                        "command": "top",
+                        "cpu": "15.3",
+                        "ttime": "0:00.08",
+                        "memory": "5172",
+                        "state": "running",
+                        "user": "root",
+                        "nice": "0",
+                        "priority": "20"
+                    },
+                    {
+                        "pid": "3785",
+                        "command": "node",
+                        "cpu": "10.2",
+                        "ttime": "0:00.94",
+                        "memory": "876892",
+                        "state": "sleeping",
+                        "user": "root",
+                        "nice": "0",
+                        "priority": "20"
+                    },
+                    {
+                        "pid": "1438",
+                        "command": "lxterminal",
+                        "cpu": "5.1",
+                        "ttime": "0:17.56",
+                        "memory": "181508",
+                        "state": "sleeping",
+                        "user": "linaro",
+                        "nice": "0",
+                        "priority": "20"
+                    }
+                ]
+              }
+        '404':
+          $ref: '#/responses/ResourceNotFoundError'
+        '500':
+          $ref: '#/responses/UnknownError'
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        requestTemplates:
+          application/json: |
+            #set($limit = $input.params('limit'))
+            {
+              "action": "retrieve",
+              "type": "process",
+              "message": {
+                "thingId": "$input.params('thingId')"
+              }
+            }
+        responses:
+          'InvalidEntityError:.*':
+            statusCode: '400'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'ResourceNotFoundError:.*':
+            statusCode: '404'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'AccessDeniedError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          'UnknownError:.*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                {
+                  "message": "$inputRoot.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: null
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - CORS
+      responses:
+        '200':
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Methods:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        httpMethod: GET
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode" : 200
+            }
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+definitions:
+  FileSystem:
+    type: object
+    properties:
+      filesystem:
+        type: string
+        minLength: 1
+        pattern: '^[/:a-zA-Z0-9]+$'
+        description: |
+          The name of the filesystem.
+      fSize:
+        type: integer
+        format: int64
+        description: |
+          The size of the filesystem.
+      used:
+        type: number
+        format: double
+        description: |
+          The percentage used for the filesystem.
+      available:
+        type: integer
+        format: int64
+        description: |
+          The amount available on the filesystem.
+      usage:
+        type: string
+        pattern: '^[0-9]{1,3}%$'
+        description: |
+          The percentage of use of the filesystem.
+      mounted:
+        type: string
+        pattern: '^[/:a-zA-Z0-9]+$'
+        description: |
+          The mount point of the filesystem.
+    required:
+      - filesystem
+      - fSize
+      - used
+      - available
+      - usage
+      - mounted
+  FileSystemList:
+    type: array
+    items:
+      $ref: '#/definitions/FileSystem'
+  MonitorDisk:
+    type: object
+    properties:
+      thingId:
+        type: string
+        pattern: '^[a-zA-Z0-9_-]$'
+        description: |
+          The identifier for a thing.
+      timestamp:
+        type: integer
+        format: int64
+        description: |
+          The seconds since the epoch, UTC
+      counter:
+        type: integer
+        format: int64
+        description: |
+          A counter used the by client to record the number of observations
+          for a session.
+      directoryList:
+        $ref: '#/definitions/FileSystemList'
+    required:
+      - thingId
+      - timestamp
+      - counter
+      - directoryList
+  MonitorGeneral:
+    type: object
+    properties:
+      thingId:
+        type: string
+        pattern: '^[a-zA-Z0-9_-]$'
+        description: |
+          The identifier for a thing.
+      timestamp:
+        type: integer
+        format: int64
+        description: |
+          The seconds since the epoch, UTC
+      deviceType:
+        type: string
+        description: |
+          Type type of device.
+      os:
+        type: string
+        description: |
+          The official name of the operating system.
+      osVariant:
+        type: string
+        description: |
+          The common name of the operating system.
+      osVersion:
+        type: string
+        description: |
+          The version of the operating system.
+      osCodename:
+        type: string
+        description: |
+          The code name for the operating system, usually specific
+          to a version.
+      build:
+        type: string
+        description: |
+          The build number of the operating system.
+      architecture:
+        type: string
+        description: |
+          The architecture of the operating system.  This provides an
+          indication of whether it is a 32-bit or 64-bit version.
+    required:
+      - thingId
+      - timestamp
+      - deviceType
+      - os
+      - osVersion
+      - architecture
+  MonitorNetwork:
+    type: object
+    properties:
+      thingId:
+        type: string
+        pattern: '^[a-zA-Z0-9_-]$'
+        description: |
+          The identifier for a thing.
+      timestamp:
+        type: integer
+        format: int64
+        description: |
+          The seconds since the epoch, UTC
+      counter:
+        type: integer
+        format: int64
+        description: |
+          A counter used the by client to record the number of observations
+          for a session.
+      totalSendRate:
+        type: number
+        format: float
+        description: |
+          The send rate for the interface for the last 10 seconds.
+      nInterface:
+        type: string
+        description: |
+          The operating system name of the network interface
+      cummulative:
+        type: array
+        items:
+          type: integer
+          format: int64
+          minItems: 3
+          maxItems: 3
+          description: |
+            The cumulative sent, receive, and total packets.
+      totalSendRecvRate:
+        type: number
+        format: float
+        description: |
+          The total rate for send and receive packets for the last
+          10 seconds.
+      macAddress:
+        type: string
+        pattern: '^([0-9a-f]{2}:){5}[0-9a-f]{2}$'
+        description: |
+          The MAC address of the ethernet interface
+      peakRate:
+        type: array
+        items:
+          type: integer
+          format: int64
+          minItems: 3
+          maxItems: 3
+          description: |
+            The peak rate for the sent, receive, and total packets.
+      totalRecvRate:
+        type: number
+        format: float
+        description: |
+          The total receive rate for the network interface for the last
+          10 seconds.
+      ipAddress:
+        type: string
+        pattern: '^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+        description: |
+          The IP address of the network interface.
+    required:
+      - thingId
+      - timestamp
+      - counter
+      - totalSendRate
+      - nInterface
+      - cummulative
+      - totalSendRecvRate
+      - macAddress
+      - peakRate
+      - totalRecvRate
+      - ipAddress
+  MonitorProcess:
+    type: object
+    properties:
+      thingId:
+        type: string
+        pattern: '^[a-zA-Z0-9_-]$'
+        description: |
+          The identifier for a thing.
+      timestamp:
+        type: integer
+        format: int64
+        description: |
+          The seconds since the epoch, UTC
+      counter:
+        type: integer
+        format: int64
+        description: |
+          A counter used the by client to record the number of observations
+          for a session.
+      loadAvg:
+        type: array
+        items:
+          type: string
+          pattern: '^[0-9\.]+$'
+          minItems: 3
+          maxItems: 3
+          description: |
+            Load average over 1, 5, and 15 minutes.  The load average is the
+            average number of jobs in the run queue.
+      cpuUsage:
+        type: array
+        items:
+          type: string
+          pattern: '^[0-9\.]+$'
+          minItems: 3
+          maxItems: 3
+          description: |
+            Percentage of processor usage, broken into user, system,
+            and idle components.
+      tasks:
+        type: array
+        items:
+          type: string
+          pattern: '^[0-9]+$'
+          minItems: 4
+          maxItems: 4
+          description: |
+            The number of total, running, sleeping, and zombie processes.
+      memory:
+        type: array
+        items:
+          type: string
+          pattern: '^[0-9]+$'
+          minItems: 4
+          maxItems: 4
+          description: |
+            The total, used, free, and buffer memory statistics.
+      processList:
+        type: array
+        items:
+          $ref: '#/definitions/Process'
+          minItems: 1
+    required:
+      - thingId
+      - timestamp
+      - counter
+      - loadAvg
+      - cpuUsage
+      - tasks
+      - memory
+      - processList
+  Process:
+    type: object
+    properties:
+      pid:
+        type: string
+        pattern: '^[0-9]+$'
+        description: |
+          The identifier of the process.
+      command:
+        type: string
+        description: |
+          The command of the process.
+      cpu:
+        type: string
+        pattern: '^[0-9\.]+$'
+        description: |
+          The CPU utilization of the process.
+      ttime:
+        type: string
+        pattern: '^[0-9]+:[0-9]{2}.[0-9]{2}$'
+        description: |
+          The total execution time of the process.
+      memory:
+        type: string
+        pattern: '^[0-9]+$'
+        description: |
+          The internal memory size of the process.
+      state:
+        type: string
+        enum:
+          - running
+          - sleeping
+          - stuck
+        description: |
+          The state of the process.
+      user:
+        type: string
+        description: |
+          The user of the process.
+    required:
+      - pid
+      - command
+      - cpu
+      - ttime
+      - memory
+      - state
+      - user
+  Thing:
+    type: object
+    properties:
+      thingId:
+        type: string
+        description: |
+          The attribute name.
+        minLength: 1
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9_-]$'
+      attributes:
+        type: object
+        description: |
+          The attributes of a thing.
+        additionalProperties:
+          type: string
+    required:
+      - thingId
+  ThingList:
+    type: array
+    items:
+      $ref: '#/definitions/Thing'
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+    required:
+      - message

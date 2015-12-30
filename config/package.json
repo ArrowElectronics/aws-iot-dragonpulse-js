@@ -1,0 +1,23 @@
+{
+  "name": "dragonpulse-config",
+  "version": "0.1.0",
+  "description": "The configuration for the DragonPulse examples.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arrowelectronics/aws-iot-dragonpulse-js.git"
+  },
+  "keywords": [
+    "DragonBoard",
+    "AWSIoT"
+  ],
+  "author": "Arrow Electronics",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arrowelectronics/aws-iot-dragonpulse-js/issues"
+  },
+  "homepage": "https://arrowelectronics.github.io/aws-iot-dragonpulse-js"
+}
