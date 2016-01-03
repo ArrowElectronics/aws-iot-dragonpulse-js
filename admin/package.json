@@ -11,7 +11,7 @@
     "url": "http://github.com/arrowelectronics/aws-iot-dragonpulse-js"
   },
   "author": "Arrow Electronics",
-  "license": "ISC",
+  "license": "Apache",
   "bugs": {
     "url": "https://github.com/arrowelectronics/aws-iot-dragonpulse-js/issues"
   },

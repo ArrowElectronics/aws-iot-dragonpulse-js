@@ -3,12 +3,21 @@ info:
   title: Arrow DragonPulse
   description: >
     The DragonPulse example collects general, disk, network, and
-    process  information from the Linux-based operating system running on the
-    DragonBoard 410c.  The information is sent through _Amazon IoT_ MQTT topics
-    and stored in _Amazon DynamoDB_ tables.
+    process information from the Linux-based operating system
+    running on the DragonBoard 410c.  The information is sent
+    through _Amazon IoT_ MQTT topics and stored in _Amazon
+    DynamoDB_ tables.
 
-    The _basePath_ is not defined as the API Gateway will add it as an
-    additional path element.
+
+    The _basePath_ is not defined as the API Gateway will add it
+    as an additional path element.
+    
+    
+    While not ideal, several of the error responses are repeated
+    throughout the Swagger definition because of Amazon API Gateway
+    Importer issue 117, Responses using $ref not being imported.
+    Once the root cause of this issue is identified, then references
+    may be used rather than the repeated definition.
   version: 0.1.0
 schemes:
   - https
@@ -34,32 +43,53 @@ responses:
     description: |
       The request was invalid.  Please check the developer documentation
       and validate the content of the request.
+    headers:
+      Access-Control-Allow-Headers:
+        type: string
+      Access-Control-Allow-Origin:
+        type: string
     schema:
       $ref: '#/definitions/Error'
     examples:
-      application/json:
-        message: 'InvalidEntityError: The entity is invalid.'
+      application/json: |
+        {
+          "message": "InvalidEntityError: The entity is invalid."
+        }
   ResourceNotFoundError:
     description: |
       The resource was not found in the environment.  For example,
       this error might be raised when a resource associated with
       a non-existent thing is attempted to be created.
+    headers:
+      Access-Control-Allow-Headers:
+        type: string
+      Access-Control-Allow-Origin:
+        type: string
     schema:
       $ref: '#/definitions/Error'
     examples:
-      application/json:
-        message: 'ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information.'
+      application/json: |
+        {
+          "message": "ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information."
+        }
   UnknownError:
     description: |
       An internal service error has occurred.  This may be the result
       of an improper configuration such as invalid permissions.  For
       some specific errors, such as invalid permissions, a specific
       error will be returned (AccessDeniedError).
+    headers:
+      Access-Control-Allow-Headers:
+        type: string
+      Access-Control-Allow-Origin:
+        type: string
     schema:
       $ref: '#/definitions/Error'
     examples:
-      application/json:
-        message: 'AccessDeniedError:  Please check the permissions needed to perform this function.'
+      application/json: |
+        {
+          "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+        }
 paths:
   /things:
     get:
@@ -90,7 +120,23 @@ paths:
                   createdDate: 13423423
               - thingId: MyOtherThing
         '500':
-          $ref: '#/responses/UnknownError'
+          description: |
+            An internal service error has occurred.  This may be the result
+            of an improper configuration such as invalid permissions.  For
+            some specific errors, such as invalid permissions, a specific
+            error will be returned (AccessDeniedError).
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+              }
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
@@ -105,6 +151,9 @@ paths:
         responses:
           'AccessDeniedError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -113,6 +162,9 @@ paths:
                 }
           'UnknownError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -191,11 +243,56 @@ paths:
           schema:
             $ref: '#/definitions/Thing'
         '400':
-          $ref: '#/responses/InvalidEntityError'
+          description: |
+            The request was invalid.  Please check the developer
+            documentation and validate the content of the request.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                message: 'InvalidEntityError: The entity is invalid.'
+              }
         '404':
-          $ref: '#/responses/ResourceNotFoundError'
+          description: |
+            The resource was not found in the environment.  For example,
+            this error might be raised when a resource associated with
+            a non-existent thing is attempted to be created.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information."
+              }
         '500':
-          $ref: '#/responses/UnknownError'
+          description: |
+            An internal service error has occurred.  This may be the result
+            of an improper configuration such as invalid permissions.  For
+            some specific errors, such as invalid permissions, a specific
+            error will be returned (AccessDeniedError).
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+              }
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
@@ -212,6 +309,9 @@ paths:
         responses:
           'InvalidEntityError:.*':
             statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -220,6 +320,9 @@ paths:
                 }
           'ResourceNotFoundError:.*':
             statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -228,6 +331,9 @@ paths:
                 }
           'AccessDeniedError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -236,6 +342,9 @@ paths:
                 }
           'UnknownError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -403,10 +512,57 @@ paths:
                   }
                 ]
               }
+        '400':
+          description: |
+            The request was invalid.  Please check the developer
+            documentation and validate the content of the request.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                message: 'InvalidEntityError: The entity is invalid.'
+              }
         '404':
-          $ref: '#/responses/ResourceNotFoundError'
+          description: |
+            The resource was not found in the environment.  For example,
+            this error might be raised when a resource associated with
+            a non-existent thing is attempted to be created.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information."
+              }
         '500':
-          $ref: '#/responses/UnknownError'
+          description: |
+            An internal service error has occurred.  This may be the result
+            of an improper configuration such as invalid permissions.  For
+            some specific errors, such as invalid permissions, a specific
+            error will be returned (AccessDeniedError).
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+              }
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
@@ -425,6 +581,9 @@ paths:
         responses:
           'InvalidEntityError:.*':
             statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -433,6 +592,9 @@ paths:
                 }
           'ResourceNotFoundError:.*':
             statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -441,6 +603,9 @@ paths:
                 }
           'AccessDeniedError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -449,6 +614,9 @@ paths:
                 }
           'UnknownError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -540,10 +708,57 @@ paths:
                 "build": "14.5.0",
                 "architecture": "x86_64"
               }
+        '400':
+          description: |
+            The request was invalid.  Please check the developer
+            documentation and validate the content of the request.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                message: 'InvalidEntityError: The entity is invalid.'
+              }
         '404':
-          $ref: '#/responses/ResourceNotFoundError'
+          description: |
+            The resource was not found in the environment.  For example,
+            this error might be raised when a resource associated with
+            a non-existent thing is attempted to be created.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information."
+              }
         '500':
-          $ref: '#/responses/UnknownError'
+          description: |
+            An internal service error has occurred.  This may be the result
+            of an improper configuration such as invalid permissions.  For
+            some specific errors, such as invalid permissions, a specific
+            error will be returned (AccessDeniedError).
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+              }
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
@@ -562,6 +777,9 @@ paths:
         responses:
           'InvalidEntityError:.*':
             statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -570,6 +788,9 @@ paths:
                 }
           'ResourceNotFoundError:.*':
             statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -578,6 +799,9 @@ paths:
                 }
           'AccessDeniedError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -586,6 +810,9 @@ paths:
                 }
           'UnknownError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -679,10 +906,57 @@ paths:
                 "totalRecvRate": 30,
                 "ipAddress": "192.168.1.139"
               }
+        '400':
+          description: |
+            The request was invalid.  Please check the developer
+            documentation and validate the content of the request.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                message: 'InvalidEntityError: The entity is invalid.'
+              }
         '404':
-          $ref: '#/responses/ResourceNotFoundError'
+          description: |
+            The resource was not found in the environment.  For example,
+            this error might be raised when a resource associated with
+            a non-existent thing is attempted to be created.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information."
+              }
         '500':
-          $ref: '#/responses/UnknownError'
+          description: |
+            An internal service error has occurred.  This may be the result
+            of an improper configuration such as invalid permissions.  For
+            some specific errors, such as invalid permissions, a specific
+            error will be returned (AccessDeniedError).
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+              }
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
@@ -701,6 +975,9 @@ paths:
         responses:
           'InvalidEntityError:.*':
             statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -709,6 +986,9 @@ paths:
                 }
           'ResourceNotFoundError:.*':
             statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -717,6 +997,9 @@ paths:
                 }
           'AccessDeniedError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -725,6 +1008,9 @@ paths:
                 }
           'UnknownError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -889,10 +1175,57 @@ paths:
                     }
                 ]
               }
+        '400':
+          description: |
+            The request was invalid.  Please check the developer
+            documentation and validate the content of the request.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                message: 'InvalidEntityError: The entity is invalid.'
+              }
         '404':
-          $ref: '#/responses/ResourceNotFoundError'
+          description: |
+            The resource was not found in the environment.  For example,
+            this error might be raised when a resource associated with
+            a non-existent thing is attempted to be created.
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "ResourceNotFoundError:  An unknown error occurred, please consult the logs for more information."
+              }
         '500':
-          $ref: '#/responses/UnknownError'
+          description: |
+            An internal service error has occurred.  This may be the result
+            of an improper configuration such as invalid permissions.  For
+            some specific errors, such as invalid permissions, a specific
+            error will be returned (AccessDeniedError).
+          headers:
+            Access-Control-Allow-Headers:
+              type: string
+            Access-Control-Allow-Origin:
+              type: string
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |
+              {
+                "message": "AccessDeniedError:  Please check the permissions needed to perform this function."
+              }
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
@@ -911,6 +1244,9 @@ paths:
         responses:
           'InvalidEntityError:.*':
             statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -919,6 +1255,9 @@ paths:
                 }
           'ResourceNotFoundError:.*':
             statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -927,6 +1266,9 @@ paths:
                 }
           'AccessDeniedError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))
@@ -935,6 +1277,9 @@ paths:
                 }
           'UnknownError:.*':
             statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: |
                 #set($inputRoot = $input.path('$'))

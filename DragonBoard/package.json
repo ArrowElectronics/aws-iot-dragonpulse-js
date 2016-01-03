@@ -2,6 +2,7 @@
   "name": "aws-iot-thing-sdk-dragonpulse-js",
   "version": "1.0.0",
   "description": "The DragonPulse project demonstrates collecting system data from a DragonBoard and publishing this data to an MQTT topic",
+  "license": "Apache",
   "keywords": ["schedule","task","job","activity","monitor","dragonboard","aws"],
   "author": {
     "name": "Arrow Electronics",
