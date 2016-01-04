@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+  {% include default/head.html %}
+
+  <body>
+
+    {% include introduction/header.html %}
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <div class="page-content">
+          <div class="wrapper">
+           {{ content }}
+         </div>
+        </div>
+      </section>
+    </div>
+
+    {% include default/footer.html %}
+
+  </body>
+</html>

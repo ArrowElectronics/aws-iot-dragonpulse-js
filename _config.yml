@@ -1,12 +1,11 @@
 title: Arrow DragonPulse
 description: >
   The Arrow DragonPulse example introduces those who have an Arrow
-  DragonBoard 410c to some of its capabilities as well as some of the Amazon
-  Web Services including IoT.  This example collects and displays general
-  system disk, process, and network information.
+  DragonBoard&trade; 410c to some of its capabilities as well as some
+  of the Amazon Web Services including IoT.  This example collects and
+  displays general system, disk, network, and process information.
 
-url:  https://github.com
-baseurl:  /ArrowElectronics/aws-iot-dragonpulse-js
+baseurl:  /aws-iot-dragonpulse-js
 
 username:  ArrowElectronics
 project:   aws-iot-dragonpulse-js
@@ -15,7 +14,7 @@ markdown: redcarpet
 markdown_ext: markdown,mkdown,mkdn,mkd,md
 
 redcarpet:
-  extensions: [ "no_intra_emphasis", "tables", "autolink", "strikethrough", "with_toc_data" ]
+  extensions: [ "no_intra_emphasis", "tables", "strikethrough", "with_toc_data" ]
 
 highlighter: pygments
 safe: true
