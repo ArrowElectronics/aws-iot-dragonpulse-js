@@ -761,6 +761,8 @@ $(document).ready(function() {
         uilib.refreshData(THING_ID,'general');
 
         $('#current-thing').html(THING_ID);
+        //reset the menu when we select something
+        $('#btn-select-device').dropdown('toggle');
      }
      return false;
   });
