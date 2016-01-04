@@ -13,7 +13,7 @@ information.
 
 For more information on the DragonPulse project, including how it is
 deployed and configured, visit the
-<a href="https://arrowelectronics.github.com/aws-iot-dragonpulse-js" target="_blank">DragonPulse Project</a>
+<a href="https://arrowelectronics.github.io/aws-iot-dragonpulse-js/" target="_blank">DragonPulse Project</a>
 
 # License
 This SDK is distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0), see LICENSE.txt and NOTICE.txt for more information.
