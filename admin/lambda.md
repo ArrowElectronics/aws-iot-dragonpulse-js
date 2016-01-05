@@ -16,14 +16,16 @@ DragonPulse Lambda functions.
 
 ## Create
 
-The Lambda functions rely upon the general
-DragonPulse configuration and
+The Lambda functions rely upon the general DragonPulse configuration and
 <a href="http://gruntjs.com", target="_blank">Grunt</a>,
-a JavaScript Task Runner.  The following steps will deploy the Lambda
+a JavaScript Task Runner.  The NODE_PATH enivronment variable should be
+set to include the lib/node_modules of the node installation and the lib
+directory of lambda function.  The following steps will deploy the Lambda
 functions
 
 ```sh
 $ cd lambda
+$ export NODE_PATH=${NODE_HOME}/lib/node_modules:lib
 $ npm install ../config
 $ npm install -g grunt-cli
 $ npm install
