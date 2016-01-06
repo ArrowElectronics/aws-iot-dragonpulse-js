@@ -246,7 +246,7 @@ a given MQTT topic
     ```json
     {
         "rule": {
-            "sql": "SELECT * as messsage FROM 'things/+/monitor/process'",
+            "sql": "SELECT 'create' as action, 'process' as type, * as messsage, topic(2) as message.thingId FROM 'things/+/monitor/process'",
             "ruleDisabled": false,
             "actions": [
                 {
