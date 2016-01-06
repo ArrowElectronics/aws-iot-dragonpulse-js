@@ -19,7 +19,9 @@ when the [thing was created](./../admin/things.html).
 The client may now be executed by issuing the following commands
 
 ```sh
+$ export PATH=/sbin:/usr/sbin:$PATH
 $ cd DragonBoard
+$ npm install
 $ npm start
 ```
 
