@@ -3,7 +3,7 @@ layout: introduction
 ---
 # Introduction
 
-The DragonPulse project is a JavaScript application that runs on the
+The DragonPulse project comprises a JavaScript application that runs on the
 DragonBoard&trade; and collects general system, disk, network, and process
 information.  The collected information is published to an MQTT topic of
 Amazon IoT where a Lambda function stores it in a DynamoDB table.  An
