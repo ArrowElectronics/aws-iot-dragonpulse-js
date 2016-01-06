@@ -25,7 +25,7 @@ d15bvgy5j2
 ```
 
 With this information, configure the DragonPulse UI client by setting the
-DB_API variable in the file ui/content/config.js (be sure to set the stage
+DB_API variable in the file ui/content/js/config.js (be sure to set the stage
 to the same value used in the <a href="./api.html">DragonPulse API</a>
 configuration)
 
@@ -34,8 +34,11 @@ var DB_API='https://d15bvgy5j2.execute-api.us-east-1.amazonaws.com/dev';
 ```
 
 Once the configuration has set, an Amazon s3 bucket may be used to host the
-client.  The bucket should have a unique name so consider appending your
-user name to the dragonpulse string
+client.  The bucket name must adhere to the
+<a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html"
+target="_blank">Bucket Restrictions and Limitations</a>.  This includes using
+lowercase names only.  The bucket should have a unique name so consider
+appending your user name to the dragonpulse string
 
 > dragonpulse-${identifier}
 
@@ -53,14 +56,14 @@ $ aws s3 cp --recursive . s3://dragonpulse-${identifier}
 ```
 
 The bucket must now be configured to accept web requests.  This is a two-step
-process which first involves setting a bucket policy.  The prototypical
-bucket policy needs to be modified to use the name of the bucket
+process that first involves setting a bucket policy.  Edit the
+ui/policy/bucket-policy.json file and update the ARN to use the bucket name
 
 ```json
 "arn:aws:s3:::dragonpulse-${identifier}/*"
 ```
 
-Once the bucket name has been set, configure the bucket policy using the
+Once the bucket policy has been modified, configure the bucket policy using the
 following command
 
 ```sh

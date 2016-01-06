@@ -34,8 +34,16 @@ in the registry
 $ cd admin/registry/${THING_ID}
 ```
 
-You will need the aws.crt and aws.key to complete the configuration of the
-client.
+## DragonPulse Client Application
+
+The generated certificates are needed by the DragonPulse Client Application to
+establish a secure connection to the MQTT server.  Copy the private key and
+public certificate to the certs directory
+
+```sh
+$ cd DragonBoard/certs
+$ cp ../../admin/registry/${THING_ID}/aws.{key,crt} .
+```
 
 # Delete
 

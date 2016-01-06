@@ -3,11 +3,12 @@ layout: introduction
 ---
 # Introduction
 
-The DragonPulse project collects general system, disk, network, and process
+The DragonPulse project is a JavaScript application that runs on the
+DragonBoard&trade; and collects general system, disk, network, and process
 information.  The collected information is published to an MQTT topic of
-Amazon IoT where a Lambda function stores it in a DynamoDB table.  A
-dashboard whose static web pages are stored in s3 accesses endpoints
-hosted on the API Gateway display the collected information.
+Amazon IoT where a Lambda function stores it in a DynamoDB table.  An
+HTML dashboard hosted using Amazon _s3_ accesses endpoints
+through the Amazon _API Gateway_ and displays the collected information.
 
 <br/>
 
@@ -24,11 +25,11 @@ When the issue is addressed, the data will be available on the dashboard.
 
 Table of Contents
 * * *
-* Functionality
+* Example Overview
     * [Collect System Information](./functionality/systemInformation.html)
 * Administration
     * [General Configuration](./admin/general_conf.html)
-    * [Foundational Elements](./admin/foundation.html)
+    * [IAM Roles and IoT Policies and Topic Rules](./admin/foundation.html)
     * [Create the Lambda Functions](./admin/lambda.html)
     * [DragonPulse API](./admin/api.html)
     * [DragonPulse Dashboard](./admin/dashboard.html)

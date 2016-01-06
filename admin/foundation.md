@@ -5,13 +5,20 @@ layout: topic
 
 The DragonPulse example uses several Amazon services including
 _API Gateway_, _Lambda_, _IoT_, and _CloudWatch_.  Amazon controls access
-to these services using _Identity and Access Management_
-(IAM).  This step will configure _IAM_ to allow the proper access and
-will also configure elements of _IoT_.  The steps below will get you started
-and if you are curious about what the administration utility does then
-consider reading the [Details](#details).
+to these services using _Identity and Access Management_ (IAM).
+The _IAM_ service provides a fine-grain permission model to control
+access to all of the Amazon services.  For
+more information about _IAM_, please consult the
+<a href="http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+target="_blank">AWS Identity and Access Management User Guide</a>.
+This step will configure _IAM_ to allow the proper access and
+the IoT policies and topic rules.
 
-# Create Foundational Elements
+The steps below will get you started and if you are curious about what
+the administration utility does beneath the covers then consider reading
+the [Details](#details).
+
+# Create IAM and IoT Elements
 
 The DragonPulse example includes several utility functions to help
 manage resources.  The following steps will configure the foundational
@@ -24,10 +31,9 @@ $ npm install
 $ node lib/foundation.js create
 ```
 
-# Remove Foundational Elements
+# Remove IAM and IoT Elements
 
-The DragonPulse configuration may be
-removed by issuing the following commands
+The DragonPulse configuration may be removed by issuing the following commands
 
 ```sh
 $ cd admin
@@ -46,16 +52,8 @@ The foundation.js script performs the following functions by Amazon service
       on MQTT topics
     * Creates a topic rule
 
-The configuration performed by the foundation.js script will be examined.
-While the foundation.js script configures several Amazon services, further
-configuration is required and will be performed by additional
-DragonPulse utilities.
-
-The _IAM_ service provides a fine-grain permission model to control access
-to all of the Amazon services.  For more information about _IAM_, please
-consult the
-<a href="http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
-target="_blank">AWS Identity and Access Management User Guide</a>.
+Additional configuration is required in order to execute DragonPulse and will
+be performed by later steps.
 
 ### API Gateway IAM Role
 
@@ -268,7 +266,7 @@ DynamoDB tables are used to store the collected information.  This step
 creates the table using the _thingId_ (string) as the partition key and does
 not use a sort key.
 
-Information Type | Table 
+Information Type | Table
 -----------------|-------
 Disk | DragonPulse-monitorDisk
 General | DragonPulse-monitorGeneral

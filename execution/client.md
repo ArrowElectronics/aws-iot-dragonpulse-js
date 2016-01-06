@@ -11,18 +11,8 @@ _IoT_ service.
 
 # Configuration
 
-The configuration of the client copies the certificates of the thing.
-
-## Certificates
-
-Copy the certificate information generated when the thing was created earlier
-to the certs directory
-
-```sh
-$ cd DragonBoard/certs
-$ export THING_ID=$(cat /etc/machine-id)
-$ cp ../../admin/registry/${THING_ID}/aws.{key,crt} .
-```
+The required certificated should have been copied to the client directory
+when the [thing was created](./../admin/things.html).
 
 # Running the Client
 

@@ -11,17 +11,16 @@ written in JavaScript
 
 # Lambda Function Management
 
-Tasks have been defined to create, update, and delete the
-DragonPulse Lambda functions.
+The following tasks have been defined to create, update, and delete
+the DragonPulse Lambda functions.
 
 ## Create
 
 The Lambda functions rely upon the general DragonPulse configuration and
 <a href="http://gruntjs.com", target="_blank">Grunt</a>,
-a JavaScript Task Runner.  The NODE_PATH enivronment variable should be
+a JavaScript Task Runner.  The NODE_PATH environment variable should be
 set to include the lib/node_modules of the node installation and the lib
-directory of lambda function.  The following steps will deploy the Lambda
-functions
+directory.  The following steps will deploy the Lambda functions
 
 ```sh
 $ cd lambda
@@ -42,9 +41,9 @@ $ aws lambda list-functions \
 --query 'Functions[?FunctionName.contains(@, `DragonPulse`)]'
 ```
 
-The create task, in addition to packaging and deploying the Lambda function,
-will also add the appropriate permissions.  The permissions needed by a
-Lambda function are mentioned in the [Detail](#detail) section.
+The create task will also add the appropriate resource-basedpermissions.
+The permissions needed by a Lambda function are mentioned in the
+[Detail](#detail) section.
 
 ## Update
 
