@@ -57,4 +57,4 @@ DiskTask.prototype.runAndParse = function(callback){
 		//skipping execution
 		console.log('skipping disk task due to missing general information');
 	}
-}
+};

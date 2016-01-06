@@ -8,7 +8,7 @@ module.exports = {
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[0-9\.%]$"
+        "pattern": "^[0-9\.%]+$"
       }
     },
     "tasks": {

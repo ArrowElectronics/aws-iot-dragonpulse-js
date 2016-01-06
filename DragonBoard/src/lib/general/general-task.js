@@ -162,9 +162,9 @@ function getOsDetailMac(){
 	return result;
 }
 
-// $ cat /var/lib/dbus/machine-id 
+// $ cat /etc/machine-id
 function getMachineIdLinux(){
-	var returnObject = childProcess.spawnSync('cat', ['/var/lib/dbus/machine-id']);
+	var returnObject = childProcess.spawnSync('cat', ['/etc/machine-id']);
 	if(returnObject.stdout){
 		return returnObject.stdout.toString().trim();
 	}
@@ -172,23 +172,23 @@ function getMachineIdLinux(){
 	return '';
 }
 
-// $ cat /etc/lsb-release
+// $ /usr/bin/lsb_release -a
 function getOsDetailLinux(){
 	var result={};
-	var returnObject = childProcess.spawnSync('cat', ['/etc/lsb-release']);
+	var returnObject = childProcess.spawnSync('/usr/bin/lsb_release', ['-a']);
 	if(returnObject.stdout){
 		var snSplit = returnObject.stdout.toString().trim().split('\n');
 		if(snSplit){
 			for(var i=0; i<snSplit.length; i++){
 				var temp = snSplit[i].trim();
-				if(temp.indexOf('DISTRIB_ID') >= 0){
-					result.osVariant=util.getValueFromKeyValueStr(temp,'=');
+				if(temp.indexOf('Distributor ID') >= 0){
+					result.osVariant=util.getValueFromKeyValueStr(temp,':');
 				}
-				if(temp.indexOf('DISTRIB_RELEASE') >= 0){
-					result.osVersion=util.getValueFromKeyValueStr(temp,'=');
+				if(temp.indexOf('Release') >= 0){
+					result.osVersion=util.getValueFromKeyValueStr(temp,':');
 				}
-				if(temp.indexOf('DISTRIB_CODENAME') >= 0){
-					result.osCodeName=util.getValueFromKeyValueStr(temp,'=');
+				if(temp.indexOf('Codename') >= 0){
+					result.osCodeName=util.getValueFromKeyValueStr(temp,':');
 				}
 			}
 		}

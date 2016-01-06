@@ -1,3 +1,7 @@
+/* The cummulative and peakRate lists should have a minimum number of items of 3, but due to an issue with the
+ * Amazon IoT service, the contents of a list are not copied.  The current value of 0 permits the information to
+ * be stored.
+ */
 module.exports = {
   "id": "/entity/monitor/network",
   "definitions": {
@@ -9,7 +13,7 @@ module.exports = {
     },
     "cummulative": {
       "type": "array",
-      "minItems": 3,
+      "minItems": 0,
       "maxItems": 3,
       "items": {
         "type": "number"
@@ -24,7 +28,7 @@ module.exports = {
     },
     "peakRate": {
       "type": "array",
-      "minItems": 3,
+      "minItems": 0,
       "maxItems": 3,
       "items": {
         "type": "number"

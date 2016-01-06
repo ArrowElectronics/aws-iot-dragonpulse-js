@@ -57,7 +57,7 @@ Util.prototype.convertStrMemory = function(input, units, isCaseSensitive){
 		}
 	}
 	return result;
-}
+};
 
 //extract the number from a string and keep it as str
 Util.prototype.extractNumberStr = function(input){
@@ -68,7 +68,7 @@ Util.prototype.extractNumberStr = function(input){
 		result = numb.join('');
 	}
 	return result;
-}
+};
 
 //extract the number from a string
 function extractNumber(input){
@@ -80,8 +80,6 @@ function extractNumber(input){
 	}
 	return result;
 }
-
-
 
 //detect the distance between the current unit and the "to" unit
 function detectDistance(currUnit, toUnit){
@@ -141,7 +139,7 @@ Util.prototype.splitKeyValue = function(line, firstDelim, secondDelim){
 		}
 	}
 	return result;
-}
+};
 
 //given a string, split into key value and return the value
 Util.prototype.getValueFromKeyValueStr = function(input, delim){
@@ -153,7 +151,7 @@ Util.prototype.getValueFromKeyValueStr = function(input, delim){
 	}
 	
 	return '';
-}
+};
 
 /**
  * IMPLEMENT AWS IOT SDK
@@ -181,7 +179,8 @@ Util.prototype.sendToAmazon = function(topic, results){
 		else{
 			certPath=INSTALLED_CERT_PATH;
 		}
-		
+
+		var mTopic = ['things', results.thingId, topic].join('/');
 		var device = awsIot.device({
 			keyPath: certPath + KEY_PEM,
 			certPath: certPath + CERT_PEM,
@@ -191,12 +190,12 @@ Util.prototype.sendToAmazon = function(topic, results){
 		});
 		
 		device.on('connect', function(){
-			console.log('writing to ' + topic);
-			device.publish(topic, message);
+			console.log('writing to ' + mTopic);
+			device.publish(mTopic, message);
 			console.log('published');
 		});
 	}
 	else{
 		console.log('no results returned');
 	}
-}
+};
