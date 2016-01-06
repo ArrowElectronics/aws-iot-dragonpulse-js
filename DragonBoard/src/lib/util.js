@@ -15,8 +15,8 @@ var awsIot = require('aws-iot-device-sdk');
  */
 var DEBUG=true;
 
-var KEY_PEM='private.pem.key';
-var CERT_PEM='certificate.pem.crt';
+var KEY_PEM='aws.key';
+var CERT_PEM='aws.crt';
 var ROOT_CA='root-CA.crt';
 
 var LOCAL_CERT_PATH='./certs/';
