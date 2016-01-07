@@ -24,7 +24,6 @@ extension, use the following command (remember to use a backtick (`)
 surrounding the DragonPulse-ApiGateway string)
 
 ```sh
-$ cd api
 $ aws iam list-roles \
 --query 'Roles[?RoleName.contains(@, `DragonPulse-ApiGateway`)].RoleName' \
 --output text
@@ -36,6 +35,7 @@ deployment region, and extension.  If available, you may also choose to use
 an operating system command such as sed
 
 ```sh
+$ cd api
 $ sed -e 's/${region}/us-east-1/g' \
 -e 's/${accountNumber}/012345678901/g' \
 -e 's/${ext}/59f4/g' dragonpulse-template.yaml > dragonpulse.yaml
