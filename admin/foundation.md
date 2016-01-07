@@ -170,7 +170,7 @@ MQTT topics
 }
 ```
 
-This policy allows connections to be established and vents to be published to
+This policy allows connections to be established and events to be published to
 a custom MQTT topic in
 
 * things/+/monitor/disk
