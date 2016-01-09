@@ -9,11 +9,6 @@ collects and transmits system information collected from the
 DragonBoard&trade;.  The client application uses the MQTT function of the
 _IoT_ service.
 
-# Configuration
-
-The required certificated should have been copied to the client directory
-when the [thing was created](./../admin/things.html).
-
 # Running the Client
 
 The client may now be executed by issuing the following commands

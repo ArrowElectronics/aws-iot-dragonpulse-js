@@ -27,22 +27,26 @@ $ export THING_ID=$(cat /etc/machine-id)
 $ node lib/things.js create ${THING_ID}
 ```
 
-The certificate of the thing with identifier of ${thingId} will be stored
-in the registry
+The certificate of the thing with identifier of ${THING_ID} will be stored
+in the location specified in the [General Configuration](./general_conf.html).
+The default location is
 
 ```sh
-$ cd admin/registry/${THING_ID}
+$ cd ~/arrow/registry/${THING_ID}
 ```
 
 ## DragonPulse Client Application
 
-The generated certificates are needed by the DragonPulse Client Application to
-establish a secure connection to the MQTT server.  Copy the private key and
-public certificate to the certs directory
+The DragonPulse client application requires the generated certificates to
+establish a secure connection to the MQTT server.  The certificate of the
+thing with identifier of ${THING_ID} will be stored in the location specified
+in the [General Configuration](./general_conf.html).  The instructions below
+assume the use of the default location.  Copy the private key and public
+certificate to the certs directory
 
 ```sh
 $ cd DragonBoard/certs
-$ cp ../../admin/registry/${THING_ID}/aws.{key,crt} .
+$ cp ~/arrow/registry/${THING_ID}/aws.{key,crt} .
 ```
 
 # Delete
