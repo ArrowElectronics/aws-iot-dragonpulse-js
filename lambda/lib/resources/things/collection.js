@@ -29,8 +29,6 @@ function thingPrincipalFilter(thing, context, iot) {
         }
       }
 
-      context.logger.info({ thing: thing, principals: result, returnValue: returnValue }, methodName);
-
       return returnValue;
     });
 }
@@ -89,8 +87,6 @@ var retrieveThings = function(message, context, iot) {
 
   return iotListThings(message)
     .then(function(thingList) {
-        context.logger.info( { thingList: thingList }, methodName);
-
         return thingList.things;
       })
     .filter(function(thing) {

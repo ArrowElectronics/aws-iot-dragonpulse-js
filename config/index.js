@@ -2,7 +2,10 @@
 
 module.exports = {
   region: 'us-east-1',
-  accountNumber: 012345678901,
+  accountNumber: '012345678901',
+  admin: {
+    registry: 'arrow/registry'
+  },
   iam: {
     lambda: {
       roleName: 'DragonPulse-Lambda'

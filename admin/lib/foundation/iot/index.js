@@ -22,10 +22,7 @@ function createPolicy(iot, policyRef) {
   var awsGetPolicy = Bluebird.promisify(iot.getPolicy, { context: iot });
   var awsCreatePolicy = Bluebird.promisify(iot.createPolicy, { context: iot });
 
-  return Bluebird.resolve()
-    .then(function() {
-        return awsGetPolicy({ policyName: policyName });
-      })
+  return awsGetPolicy({ policyName: policyName })
     .then(function(policy) {
         console.info('IoT Policy of ' + policyName + ' already exists');
       })
@@ -59,10 +56,7 @@ function createTopic(iot, topicRuleRef) {
   var awsGetTopicRule = Bluebird.promisify(iot.getTopicRule, { context: iot });
   var awsCreateTopicRule = Bluebird.promisify(iot.createTopicRule, { context: iot });
 
-  return Bluebird.resolve()
-    .then(function() {
-        return awsGetTopicRule({ ruleName: ruleName });
-      })
+  return awsGetTopicRule({ ruleName: ruleName })
     .then(function(topicRule) {
         console.info('IoT Topic Rule of ' + ruleName + ' already exists');
       })
@@ -73,13 +67,13 @@ function createTopic(iot, topicRuleRef) {
 
           return Bluebird.resolve()
             .then(function() {
-              var params = {
-                ruleName: ruleName,
-                topicRulePayload: topicRules[topicRuleRef]
-              };
+                var params = {
+                  ruleName: ruleName,
+                  topicRulePayload: topicRules[topicRuleRef]
+                };
 
-              return awsCreateTopicRule(params);
-            })
+                return awsCreateTopicRule(params);
+              })
         }
       }
 
@@ -97,17 +91,20 @@ function setLoggingOptions(iot) {
         return dynamicRoleHelper.findRole(config.iam.iot.roleName);
       })
     .then(function(iotRole) {
-      var awsSetLoggingOptions = Bluebird.promisify(iot.setLoggingOptions, { context: iot });
+        var awsSetLoggingOptions = Bluebird.promisify(iot.setLoggingOptions, { context: iot });
 
-      var params = {
-        loggingOptionsPayload: {
-          roleArn: iotRole.Arn,
-          logLevel: 'DEBUG'
-        }
-      };
+        var params = {
+          loggingOptionsPayload: {
+            roleArn: iotRole.Arn,
+            logLevel: 'DEBUG'
+          }
+        };
 
-      return awsSetLoggingOptions(params);
-    });
+        return awsSetLoggingOptions(params);
+      })
+    .catch(function(err) {
+        throw err;
+      });
 }
 
 function createResources() {
@@ -117,17 +114,26 @@ function createResources() {
 
   return Bluebird.resolve()
     .then(function() {
-        Bluebird.each(Object.keys(policies), function (policyRef) {
-          return createPolicy(iot, policyRef);
-        })
+        return Bluebird.each(Object.keys(policies), function (policyRef) {
+              return createPolicy(iot, policyRef);
+            })
+          .catch(function(err) {
+              throw err;
+            });
       })
     .then(function() {
-        Bluebird.each(Object.keys(topicRules), function (topicRuleRef) {
-          return createTopic(iot, topicRuleRef);
-        })
+        return Bluebird.each(Object.keys(topicRules), function (topicRuleRef) {
+              return createTopic(iot, topicRuleRef);
+            })
+          .catch(function(err) {
+              throw err;
+            });
       })
     .then(function() {
         return setLoggingOptions(iot);
+      })
+    .catch(function(err) {
+        throw err;
       });
 }
 
@@ -137,15 +143,18 @@ function deletePolicy(iot, policyRef) {
     throw new TypeError('Invalid configuration for iot.policies as ' + policyName + ' is not defined.');
   }
 
-  console.info('Deleting IoT policy for ' + policyName);
-
   var awsDeletePolicy = Bluebird.promisify(iot.deletePolicy, { context: iot });
 
-  return Bluebird.resolve()
+  return awsDeletePolicy({
+        policyName: policyName
+      })
     .then(function() {
-        awsDeletePolicy({
-          policyName: policyName
-        });
+        console.info('Deleting IoT policy for ' + policyName);
+      })
+    .catch(function(err) {
+        if (err.code !== 'ResourceNotFoundException') {
+          throw err;
+        }
       });
 }
 
@@ -155,15 +164,19 @@ function deleteTopic(iot, topicRuleRef) {
     throw new TypeError('Invalid configuration for iot.topics as ' + topicRuleRef + ' is not defined.');
   }
 
-  console.info ('Deleting IoT topic rule for ' + ruleName);
-
   var awsDeleteTopicRule = Bluebird.promisify(iot.deleteTopicRule, { context: iot });
 
-  return Bluebird.resolve()
+  return awsDeleteTopicRule({
+        ruleName: ruleName
+      })
     .then(function() {
-        awsDeleteTopicRule({
-          ruleName: ruleName
-        });
+        console.info ('Deleting IoT topic rule for ' + ruleName);
+      })
+    .catch(function(err) {
+        // The AWS service throws an unauthorized exception rather than a resource not found exception
+        if (err.code !== 'UnauthorizedException') {
+          throw err;
+        }
       });
 }
 
@@ -174,15 +187,24 @@ function deleteResources(context) {
 
   return Bluebird.resolve()
     .then(function() {
-      Bluebird.each(Object.keys(policies), function (policyRef) {
-        return deletePolicy(iot, policyRef);
+        return Bluebird.each(Object.keys(policies), function (policyRef) {
+              return deletePolicy(iot, policyRef);
+            })
+          .catch(function(err) {
+              throw err;
+            });
       })
-    })
     .then(function() {
-      Bluebird.each(Object.keys(topicRules), function(topicRuleRef) {
-        return deleteTopic(iot, topicRuleRef);
+        return Bluebird.each(Object.keys(topicRules), function(topicRuleRef) {
+              return deleteTopic(iot, topicRuleRef);
+            })
+          .catch(function(err) {
+              throw err;
+            });
       })
-    });
+    .catch(function(err) {
+        throw err;
+      });
 }
 
 var manage = function(cmd) {

@@ -6,20 +6,24 @@ var fs = require('fs'),
 var AWS = require('aws-sdk'),
     Bluebird = require('bluebird'),
     mkdirp = require('mkdirp'),
+    homedir = require('home-dir'),
     rimraf = require('rimraf');
 
 var config = require('dragonpulse-config'),
+    SimpleError = require('./../errors/simpleerror'),
     configureAws = require('./../util/helper').configureAws;
 
-var REGISTRY_BASE = './../../registry';
 var KEYS_AND_CERTIFICATES_FILE_NAME = 'certificatesAndKeys.json';
 
+var RESOURCE_NOT_FOUND_ERROR = 'ResourceNotFoundError';
+
 function getRegistry(thingId) {
-  return path.join(path.relative(process.cwd(), path.dirname(module.filename)), REGISTRY_BASE, thingId);
+  return path.join(homedir(), config.admin.registry, thingId);
 }
 
 function getThing(iot, context) {
   var awsDescribeThing = Bluebird.promisify(iot.describeThing, { context: iot });
+  var awsListThingPrincipals = Bluebird.promisify(iot.listThingPrincipals, { context: iot });
 
   var params = {
     thingName: context.thingId
@@ -27,26 +31,43 @@ function getThing(iot, context) {
 
   return awsDescribeThing(params)
     .then(function(thing) {
-        return {
-          thingId: thing.thingName,
-          attributes: thing.attributes
+        return awsListThingPrincipals({
+              thingName: thing.thingName
+            })
+          .then(function(result) {
+              var principals = result.principals;
+              if (principals.length > 0) {
+                return {
+                  thingId: thing.thingName,
+                  attributes: thing.attributes,
+                  principal: principals[0]
+                }
+              }
+
+              throw new SimpleError(RESOURCE_NOT_FOUND_ERROR);
+            })
+          .catch(function(err) {
+              throw err;
+            });
+      })
+    .catch(function(err) {
+        if (err.statusCode === 404) {
+          throw new SimpleError(RESOURCE_NOT_FOUND_ERROR, err);
         }
+
+        throw err;
       });
 }
 
 function getOrCreateThing(iot, context) {
   return getThing(iot, context)
     .catch(function(err) {
-      switch(err.statusCode) {
-        case 404: {
-          // The thing does not exist
+        if (err.name === 'SimpleError' && err.condition === RESOURCE_NOT_FOUND_ERROR) {
           return createThing(iot, context);
         }
-        default: {
-          throw err;
-        }
-      }
-    })
+
+        throw err;
+      });
 }
 
 function createThing(iot, context) {
@@ -54,31 +75,8 @@ function createThing(iot, context) {
 
   var awsCreateThing = Bluebird.promisify(iot.createThing, { context: iot });
 
-  var params = {
-    thingName: context.thingId
-  };
-
-  return awsCreateThing(params)
-    .then(function() {
-        return createPrincipal(iot, context);
-      })
-    .then(function(keyAndCertificates) {
-        return attachPrincipalToThing(iot, keyAndCertificates.certificateArn, context)
-          .then(function() {
-              return updateThingAttributes(iot, keyAndCertificates, context);
-            })
-          .catch(function(err) {
-              throw err;
-            });
-      });
-}
-
-function updateThingAttributes(iot, keyAndCertificate, context) {
-  var awsUpdateThing = Bluebird.promisify(iot.updateThing, { context: iot });
-
   var attributes = {
-    reference: 'ArrowDragonConnectAndDragonPulse',
-    certificateArn: keyAndCertificate.certificateArn
+    reference: 'ArrowDragonConnectAndDragonPulse'
   };
 
   var params = {
@@ -88,12 +86,22 @@ function updateThingAttributes(iot, keyAndCertificate, context) {
     }
   };
 
-  return awsUpdateThing(params)
+  return awsCreateThing(params)
     .then(function() {
-        return {
-          thingId: context.thingId,
-          attributes: attributes
-        }
+        return createPrincipal(iot, context);
+      })
+    .then(function(keyAndCertificates) {
+        return attachPrincipalToThing(iot, keyAndCertificates.certificateArn, context)
+          .then(function() {
+              return {
+                thingId: context.thingId,
+                attributes: attributes,
+                principal: keyAndCertificates.certificateArn
+              };
+            })
+          .catch(function(err) {
+              throw err;
+            });
       })
     .catch(function(err) {
         throw err;
@@ -129,25 +137,40 @@ function attachPrincipalToThing(iot, certificateArn, context) {
 
   var awsAttachThingPrincipal = Bluebird.promisify(iot.attachThingPrincipal, { context: iot });
 
-  return Bluebird.resolve()
-    .then(function() {
-      return awsAttachThingPrincipal({
+  return awsAttachThingPrincipal({
         principal: certificateArn,
         thingName: context.thingId
       })
-    })
+    .catch(function(err) {
+        throw err;
+      });
 }
 
 function attachPolicyToPrincipal(iot, thing) {
   var policyName = config.iot.policies.DragonPulseThing;
 
-  console.info('Attaching policy ' + policyName + ' to principal for thing ' + thing.thingId);
-
   var awsAttachPrincipalPolicy = Bluebird.promisify(iot.attachPrincipalPolicy, { context: iot });
 
   return awsAttachPrincipalPolicy({
         policyName: policyName,
-        principal: thing.attributes.certificateArn
+        principal: thing.principal
+      })
+    .then(function() {
+        console.info('Attaching policy ' + policyName + ' to principal for thing ' + thing.thingId);
+      })
+    .catch(function(err) {
+        throw err;
+      });
+}
+
+function validatePolicy(iot) {
+  var awsGetPolicy = Bluebird.promisify(iot.getPolicy, { context: iot });
+
+  return awsGetPolicy({
+        policyName: config.iot.policies.DragonPulseThing
+      })
+    .catch(function(err) {
+        throw new TypeError('Policy ' + config.iot.policies.DragonPulseThing + ' must exist before creating a thing');
       });
 }
 
@@ -156,13 +179,16 @@ function createResources(context) {
 
   var iot = new AWS.Iot();
 
-  return getOrCreateThing(iot, context)
+  return validatePolicy(iot)
+    .then(function() {
+        return getOrCreateThing(iot, context)
+      })
     .then(function(thing) {
         return attachPolicyToPrincipal(iot, thing);
       })
     .catch(function(err) {
         console.error('ERROR');
-        console.error('  Message:  ' + err.message);
+        console.error('  Message: ' + err.message);
       });
 }
 
@@ -240,12 +266,7 @@ function deleteResources(context) {
 
   return getThing(iot, context)
     .then(function(thing) {
-        if (!thing.attributes.hasOwnProperty('certificateArn')) {
-          throw new ReferenceError('Thing ' + context.thingId + ' was not created properly.  ' +
-            'It should have an attribute of certificateArn.');
-        }
-
-        var certificateArn = thing.attributes.certificateArn;
+        var certificateArn = thing.principal;
         var certificateId = /.*cert\/(.*)/.exec(certificateArn)[1];
 
         detachPoliciesFromPrincipal(iot, certificateArn, context)
