@@ -1,5 +1,5 @@
 var AWS = require('aws-sdk'),
-    Bluebird = require('Bluebird');
+    Bluebird = require('bluebird');
 
 var config = require('dragonpulse-config'),
     configureAws = require('./../../util/helper').configureAws;
