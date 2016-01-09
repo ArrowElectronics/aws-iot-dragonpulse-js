@@ -23,7 +23,7 @@ When the issue is addressed, the data will be available on the dashboard.
 
 <br/>
 
-Table of Contents
+### Table of Contents
 * * *
 * Example Overview
     * [Collect System Information](./functionality/systemInformation.html)
