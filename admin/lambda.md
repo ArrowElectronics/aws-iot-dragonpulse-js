@@ -81,6 +81,10 @@ Target | Lambda Function
 things | DragonPulse-things
 monitor  | DragonPulse-monitor
 
+<div class="detail">
+<hr>
+</div>
+
 # Detail
 
 The management of the Lambda functions require each function to be packaged
