@@ -27,6 +27,7 @@ var INSTALLED_CERT_PATH='/home/linaro/certs/';
  * Initialize a new NetworkTask
  */
 function Util(){
+    this.awsConnectionPool={};
 }
 
 // convert the str memory to target unit
@@ -180,26 +181,44 @@ Util.prototype.sendToAmazon = function(topic, results){
 			certPath=INSTALLED_CERT_PATH;
 		}
         
-        console.log('t: ' + topic);
+        var wDevice=null;
+        var device=null;
+        
+        if(this.awsConnectionPool.hasOwnProperty(results.thingId)){
+            wDevice = this.awsConnectionPool[results.thingId];
+        }
+        else{
+            //build a new connection
+            device = awsIot.device({
+                keyPath: certPath + KEY_PEM,
+                certPath: certPath + CERT_PEM,
+                caPath: certPath + ROOT_CA,
+                clientId: clientId,
+                region: 'us-east-1',
+		     });
+             
+             //store the connection into the queue
+            device.on('connect', function(){
+                this.awsConnectionPool[results.thingId] = device;
+            });
+            
+            device.on('close', function(){
+                delete this.awsConnectionPool[results.thingId];
+            });
+            
+            device.on('reconnect', function(){
+                this.awsConnectionPool[results.thingId] = device;
+            });
+        }
+        
         var mTopic = ['things', results.thingId, topic].join('/');
         
-        console.log('m: ' + mTopic);
-        
-		var device = awsIot.device({
-			keyPath: certPath + KEY_PEM,
-			certPath: certPath + CERT_PEM,
-			caPath: certPath + ROOT_CA,
-			clientId: clientId,
-			region: 'us-east-1',
-            reconnectPeriod: 50000
-		});
-		
-		device.on('connect', function(){
-			console.log('writing to ' + mTopic);
-			device.publish(mTopic, message);
+        if(this.awsConnectionPool.hasOwnProperty(results.thingId)){
+            wDevice = this.awsConnectionPool[results.thingId];
+            console.log('writing to ' + mTopic);
+			wDevice.publish(mTopic, message);
 			console.log('published');
-		});
-       
+        }
 	}
 	else{
 		console.log('no results returned');
