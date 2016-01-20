@@ -15,19 +15,20 @@ var awsIot = require('aws-iot-device-sdk');
  */
 var DEBUG=true;
 
-var KEY_PEM='private.pem.key';
-var CERT_PEM='certificate.pem.crt';
+var KEY_PEM='aws.key';
+var CERT_PEM='aws.crt';
 var ROOT_CA='root-CA.crt';
 
 var LOCAL_CERT_PATH='./certs/';
 var INSTALLED_CERT_PATH='/home/linaro/certs/';
+
+var awsConnectionPool={};
 
 /**
  * Constructor
  * Initialize a new NetworkTask
  */
 function Util(){
-    this.awsConnectionPool={};
 }
 
 // convert the str memory to target unit
@@ -181,11 +182,13 @@ Util.prototype.sendToAmazon = function(topic, results){
 			certPath=INSTALLED_CERT_PATH;
 		}
         
+        var mTopic = ['things', results.thingId, topic].join('/');
+        
         var wDevice=null;
         var device=null;
         
-        if(this.awsConnectionPool.hasOwnProperty(results.thingId)){
-            wDevice = this.awsConnectionPool[results.thingId];
+        if(awsConnectionPool.hasOwnProperty(results.thingId)){
+            wDevice = awsConnectionPool[results.thingId];
         }
         else{
             //build a new connection
@@ -196,28 +199,31 @@ Util.prototype.sendToAmazon = function(topic, results){
                 clientId: clientId,
                 region: 'us-east-1',
 		     });
-            
-            //allow access
-            var connectionPool = this.awsConnectionPool; 
              
              //store the connection into the queue
             device.on('connect', function(){
-                connectionPool[results.thingId] = device;
+                console.log('aws queue connected.');
+                awsConnectionPool[results.thingId] = device;
+                
+                //we write here or else it gets lost
+                console.log('writing to ' + mTopic);
+                device.publish(mTopic, message);
+                console.log('published');
             });
             
             device.on('close', function(){
-                delete connectionPool[results.thingId];
+                console.log('aws queue closed.')
+                delete awsConnectionPool[results.thingId];
             });
             
             device.on('reconnect', function(){
-                connectionPool[results.thingId] = device;
+                console.log('aws queue reconnected...')
+                awsConnectionPool[results.thingId] = device;
             });
         }
-        
-        var mTopic = ['things', results.thingId, topic].join('/');
-        
-        if(this.awsConnectionPool.hasOwnProperty(results.thingId)){
-            wDevice = this.awsConnectionPool[results.thingId];
+
+        if(awsConnectionPool.hasOwnProperty(results.thingId)){
+            wDevice = awsConnectionPool[results.thingId];
             console.log('writing to ' + mTopic);
 			wDevice.publish(mTopic, message);
 			console.log('published');
