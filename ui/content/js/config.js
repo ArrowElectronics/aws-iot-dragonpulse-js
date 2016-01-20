@@ -15,6 +15,6 @@ var THING_ID = '';
 //refresh times
 //times are in ms. 1000 ms = 1 second
 //NOTE: due to limitations of AWS, we can poll faster, but it will require rate throttling changes on Amazon side
-var DISK_REFRESH_INTERVAL = 5000;
-var PROCESS_REFRESH_INTERVAL = 3000;
-var NETWORK_REFRESH_INTERVAL = 5000;
+var DISK_REFRESH_INTERVAL = 30000;
+var PROCESS_REFRESH_INTERVAL = 30000;
+var NETWORK_REFRESH_INTERVAL = 30000;
