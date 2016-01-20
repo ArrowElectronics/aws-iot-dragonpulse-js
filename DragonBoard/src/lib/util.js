@@ -180,14 +180,18 @@ Util.prototype.sendToAmazon = function(topic, results){
 			certPath=INSTALLED_CERT_PATH;
 		}
         
-        /*
-		var mTopic = ['things', results.thingId, topic].join('/');
+        console.log('t: ' + topic);
+        var mTopic = ['things', results.thingId, topic].join('/');
+        
+        console.log('m: ' + mTopic);
+        
 		var device = awsIot.device({
 			keyPath: certPath + KEY_PEM,
 			certPath: certPath + CERT_PEM,
 			caPath: certPath + ROOT_CA,
 			clientId: clientId,
-			region: 'us-east-1'
+			region: 'us-east-1',
+            reconnectPeriod: 50000
 		});
 		
 		device.on('connect', function(){
@@ -195,7 +199,7 @@ Util.prototype.sendToAmazon = function(topic, results){
 			device.publish(mTopic, message);
 			console.log('published');
 		});
-        */
+       
 	}
 	else{
 		console.log('no results returned');
