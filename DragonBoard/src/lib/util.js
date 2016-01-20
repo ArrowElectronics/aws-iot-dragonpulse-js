@@ -196,18 +196,21 @@ Util.prototype.sendToAmazon = function(topic, results){
                 clientId: clientId,
                 region: 'us-east-1',
 		     });
+            
+            //allow access
+            var connectionPool = this.awsConnectionPool; 
              
              //store the connection into the queue
             device.on('connect', function(){
-                this.awsConnectionPool[results.thingId] = device;
+                connectionPool[results.thingId] = device;
             });
             
             device.on('close', function(){
-                delete this.awsConnectionPool[results.thingId];
+                delete connectionPool[results.thingId];
             });
             
             device.on('reconnect', function(){
-                this.awsConnectionPool[results.thingId] = device;
+                connectionPool[results.thingId] = device;
             });
         }
         
