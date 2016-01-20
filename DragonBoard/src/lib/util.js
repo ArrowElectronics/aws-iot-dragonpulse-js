@@ -179,7 +179,8 @@ Util.prototype.sendToAmazon = function(topic, results){
 		else{
 			certPath=INSTALLED_CERT_PATH;
 		}
-
+        
+        /*
 		var mTopic = ['things', results.thingId, topic].join('/');
 		var device = awsIot.device({
 			keyPath: certPath + KEY_PEM,
@@ -194,6 +195,7 @@ Util.prototype.sendToAmazon = function(topic, results){
 			device.publish(mTopic, message);
 			console.log('published');
 		});
+        */
 	}
 	else{
 		console.log('no results returned');
