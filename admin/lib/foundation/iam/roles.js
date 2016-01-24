@@ -96,7 +96,8 @@ module.exports = {
             "Effect": ALLOW,
             "Action": [
               "iot:ListThings",
-              "iot:ListThingPrincipals"
+              "iot:ListThingPrincipals",
+              "iot:ListPrincipalPolicies"
             ],
             "Resource": [
               "*"
