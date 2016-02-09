@@ -140,8 +140,8 @@ paths:
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
-        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-things/invocations'
-        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        uri: 'arn:aws:apigateway:__aws_region__:lambda:path/2015-03-31/functions/arn:aws:lambda:__aws_region__:__aws_accountNumber__:function:DragonPulse-things/invocations'
+        credentials: 'arn:aws:iam::__aws_accountNumber__:role/DragonPulse-ApiGateway-__aws_ext__'
         requestTemplates:
           application/json: |
             {
@@ -296,8 +296,8 @@ paths:
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
-        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-things/invocations'
-        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        uri: 'arn:aws:apigateway:__aws_region__:lambda:path/2015-03-31/functions/arn:aws:lambda:__aws_region__:__aws_accountNumber__:function:DragonPulse-things/invocations'
+        credentials: 'arn:aws:iam::__aws_accountNumber__:role/DragonPulse-ApiGateway-__aws_ext__'
         requestTemplates:
           application/json: |
             {
@@ -566,8 +566,8 @@ paths:
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
-        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
-        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        uri: 'arn:aws:apigateway:__aws_region__:lambda:path/2015-03-31/functions/arn:aws:lambda:__aws_region__:__aws_accountNumber__:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::__aws_accountNumber__:role/DragonPulse-ApiGateway-__aws_ext__'
         requestTemplates:
           application/json: |
             #set($limit = $input.params('limit'))
@@ -762,8 +762,8 @@ paths:
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
-        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
-        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        uri: 'arn:aws:apigateway:__aws_region__:lambda:path/2015-03-31/functions/arn:aws:lambda:__aws_region__:__aws_accountNumber__:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::__aws_accountNumber__:role/DragonPulse-ApiGateway-__aws_ext__'
         requestTemplates:
           application/json: |
             #set($limit = $input.params('limit'))
@@ -960,8 +960,8 @@ paths:
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
-        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
-        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        uri: 'arn:aws:apigateway:__aws_region__:lambda:path/2015-03-31/functions/arn:aws:lambda:__aws_region__:__aws_accountNumber__:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::__aws_accountNumber__:role/DragonPulse-ApiGateway-__aws_ext__'
         requestTemplates:
           application/json: |
             #set($limit = $input.params('limit'))
@@ -1229,8 +1229,8 @@ paths:
       x-amazon-apigateway-integration:
         type: AWS
         httpMethod: POST
-        uri: 'arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountNumber}:function:DragonPulse-monitor/invocations'
-        credentials: 'arn:aws:iam::${accountNumber}:role/DragonPulse-ApiGateway-${ext}'
+        uri: 'arn:aws:apigateway:__aws_region__:lambda:path/2015-03-31/functions/arn:aws:lambda:__aws_region__:__aws_accountNumber__:function:DragonPulse-monitor/invocations'
+        credentials: 'arn:aws:iam::__aws_accountNumber__:role/DragonPulse-ApiGateway-__aws_ext__'
         requestTemplates:
           application/json: |
             #set($limit = $input.params('limit'))

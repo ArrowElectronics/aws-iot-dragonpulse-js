@@ -4,3 +4,8 @@ node_modules
 dragonpulse.yaml
 dist
 logs
+Gemfile.lock
+lambda/dist
+lambda/logs
+.DS_Store
+.settings

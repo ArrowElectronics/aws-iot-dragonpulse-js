@@ -1,10 +1,10 @@
 'use strict';
 
 module.exports = {
-  region: 'us-east-1',
-  accountNumber: '012345678901',
+  region: '__aws_region__',
+  accountNumber: '__aws_accountNumber__',
   admin: {
-    registry: 'arrow/registry'
+    registry: '__aws_registryDir__'
   },
   iam: {
     lambda: {
