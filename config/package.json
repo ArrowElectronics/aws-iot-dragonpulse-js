@@ -19,8 +19,5 @@
   "bugs": {
     "url": "https://github.com/arrowelectronics/aws-iot-dragonpulse-js/issues"
   },
-  "homepage": "https://arrowelectronics.github.io/aws-iot-dragonpulse-js",
-  "dependencies": {
-    "bluebird": "3.2.x"
-  }
+  "homepage": "https://arrowelectronics.github.io/aws-iot-dragonpulse-js"
 }
