@@ -19,13 +19,15 @@ AWS_S3_IDENTIFIER=""
 AWS_API_EXTENSION=""
 AWS_API_GATEWAY=""
 
+THING_ID=""
+
 AWS_CONFIG_LOCATION="/home/linaro/.aws/config"
 
 NODE_PATH=""
 CERT_REGISTRY_DIR=""
 
 echo -e "################################################"
-echo -e "# Welcome to Arrow's $ARROW_APP_SEARCH_NEEDLE for Amazon AWS       #"
+echo -e "# Welcome to Arrow's $ARROW_APP_SEARCH_NEEDLE for Amazon AWS       "
 echo -e "#    This script will setup and provision your $ARROW_APP_SEARCH_NEEDLE"
 echo -e "################################################"
 
@@ -94,14 +96,17 @@ echo "ARROW_SCRIPTS_DIR=$ARROW_SCRIPTS_DIR">>$ARROW_SCRIPTS_DIR/$ARROW_INSTALLER
 
 #------------------
 
-echo -e "Enter a Location to Store Certificates and Keys (Default is $BASE_DRAGONBOARD_DIR/$DEFAULT_REGISTRY_DIR):"
-read pCertDir
+# REMOVE the ability to choose a registry location
+#echo -e "Enter a Location to Store Certificates and Keys (Default is $BASE_DRAGONBOARD_DIR/$DEFAULT_REGISTRY_DIR):"
+#read pCertDir
 
-if [ "$pCertDir" != "" ] ; then
-    ARROW_CERT_DIR=$pCertDir
-else
-   ARROW_CERT_DIR=$DEFAULT_REGISTRY_DIR
-fi
+#if [ "$pCertDir" != "" ] ; then
+#    ARROW_CERT_DIR=$pCertDir
+#else
+#   ARROW_CERT_DIR=$BASE_DRAGONBOARD_DIR/$DEFAULT_REGISTRY_DIR
+#fi
+
+ARROW_CERT_DIR=$BASE_DRAGONBOARD_DIR/$DEFAULT_REGISTRY_DIR
 
 #store to .settings
 echo "ARROW_CERT_DIR=$ARROW_CERT_DIR">>$ARROW_SCRIPTS_DIR/$ARROW_INSTALLER_SETTINGS
@@ -335,12 +340,22 @@ if [ -d "$BASE_DRAGONBOARD_DIR/$ARROW_DIR/$ARROW_APPLICATION" ]; then
 
 	echo -e "***Installing Certificates for the Device..."
 	cd DragonBoard/certs
-	cp $BASE_DRAGONBOARD_DIR/$ARROW_CERT_DIR/$THING_ID/aws.{key,crt} .
+	cp $ARROW_CERT_DIR/$THING_ID/aws.{key,crt} .
+
+    #reset the path
+    cd $BASE_DRAGONBOARD_DIR/$ARROW_DIR/$ARROW_APPLICATION
+
+#------------------
+
+    echo -e "***Building Client..."
+
+    cd DragonBoard
+    npm install
 
 #------------------
 	
 echo -e "################################################"
-echo -e "# Build Complete       #"
+echo -e "# Build Complete       "
 echo -e "################################################"
 
     #build s3 path
