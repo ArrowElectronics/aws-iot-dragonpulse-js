@@ -88,6 +88,10 @@ if [ -f "ui/content/js/config.js" ]; then
 	rm ui/content/js/config.js
 fi
 
+if [ -f "DragonBoard/src/config.js" ]; then
+	rm DragonBoard/src/config.js
+fi
+
 #----------------------------
 
 #store to .settings
@@ -348,8 +352,13 @@ if [ -d "$BASE_DRAGONBOARD_DIR/$ARROW_DIR/$ARROW_APPLICATION" ]; then
 #------------------
 
     echo -e "***Building Client..."
-
+    
     cd DragonBoard
+    
+    cd src
+    sed -e "s#__aws_region__#$AWS_REGION#g" -e "s#__aws_registryDir__#$ARROW_CERT_DIR#g" config_template.js > config.js
+    cd ..
+    
     npm install
 
 #------------------

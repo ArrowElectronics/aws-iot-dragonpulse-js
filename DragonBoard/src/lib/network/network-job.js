@@ -17,9 +17,9 @@ var util = new iUtil();
  * Constructor
  * Initialize a new NetworkJob
  */
-function NetworkJob(info){
+function NetworkJob(info,config){
 	this.rule= new schedule.RecurrenceRule();
-	this.rule.second = new schedule.Range(0,59,30);
+	this.rule.second = new schedule.Range(0,59,config.networkRefresh);
 
 	this.task= new networkTask(info);
 }

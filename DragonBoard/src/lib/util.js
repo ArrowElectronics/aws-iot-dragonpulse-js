@@ -9,6 +9,7 @@ module.exports = Util;
  * Module dependencies
  */
 var awsIot = require('aws-iot-device-sdk');
+var config = require('../config');
 
 /**
  * Constants

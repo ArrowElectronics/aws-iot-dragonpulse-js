@@ -24,9 +24,9 @@ var GENERAL_TOPIC = 'monitor/general';
  * Constructor
  * Initialize a new GeneralJob
  */
-function GeneralJob(){
+function GeneralJob(config){
 	this.rule= new schedule.RecurrenceRule();
-	this.rule.second = new schedule.Range(0,59,5);
+	this.rule.second = new schedule.Range(0,59,config.generalRefresh);
 
 	this.task= new generalTask();
 }

@@ -8,19 +8,20 @@ var networkJob = require('./lib/network/network-job');
 var processJob = require('./lib/process/process-job');
 var generalJob = require('./lib/general/general-job');
 var schedule = require('node-schedule');
+var config = require('./config');
 
 /**
  * Main
  */
 //go run the general job, wait for it to finish, then run the rest of the jobs
 
-var gjInstance = new generalJob();
+var gjInstance = new generalJob(config);
 var generalInfo = gjInstance.init();
 
 //create the disk job
-var djInstance = new diskJob(generalInfo);
-var njInstance = new networkJob(generalInfo);
-var pjInstance = new processJob(generalInfo);
+var djInstance = new diskJob(generalInfo,config);
+var njInstance = new networkJob(generalInfo,config);
+var pjInstance = new processJob(generalInfo,config);
 
 /**
  * Constants

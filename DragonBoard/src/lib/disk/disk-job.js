@@ -17,9 +17,9 @@ var util = new iUtil();
  * Constructor
  * Initialize a new DiskJob
  */
-function DiskJob(info){
+function DiskJob(info,config){
 	this.rule= new schedule.RecurrenceRule();
-	this.rule.second = new schedule.Range(0,59,45);
+	this.rule.second = new schedule.Range(0,59,config.diskRefresh);
 
 	this.task= new diskTask(info);
 }
